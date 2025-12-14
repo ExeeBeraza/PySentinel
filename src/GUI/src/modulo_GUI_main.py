@@ -95,7 +95,7 @@ if __name__ == "__main__":
     root.mainloop()
 
 '''
-
+import tkinter.filedialog
 from pathlib import Path
 import tkinter as tk
 import tkinter.font as tkFont
@@ -104,6 +104,7 @@ from PIL import Image, ImageTk
 # from modulo_GUI_singin import Registro
 from modulo_GUI_Perfil import Perfil
 from modulo_GUI_historial import Historial
+from src.pistola.detect import detectar_pistola
 
 
 #--------------------------PRINCIPAL--------------------------------------------
@@ -187,7 +188,7 @@ class Principal:
                                 font=tkFont.Font(family='Times', size=10),
                                 fg="#000000", justify="center",
                                 text="+ ADD IMAGES",
-                                command=self.GButton_534_command)
+                                command=self.buscar_imagen)
         GButton_534.place(x=10, y=60, width=580, height=424)
 
     def GButton_560_command(self):
@@ -196,8 +197,13 @@ class Principal:
     def GButton_759_command(self):
         Historial(self.root)
 
-    def GButton_534_command(self):
-        print("commaasdfasdnd")
+    def buscar_imagen(self):
+       image_path = tkinter.filedialog.askopenfilename(
+            title="Seleccionar imagen",
+            filetypes=(("png", "*.png"), ("jpeg", "*.jpg")),
+       )
+       detectar_pistola(image_path)
+       print("deteccion realizada")
 
 
 if __name__ == "__main__":

@@ -25,3 +25,18 @@ while True:
     break
 
 cv.destroyAllWindows()
+
+
+def detectar_pistola(ruta_imagen):
+    model = torch.hub.load(
+        'ultralytics/yolov5',
+        'custom',
+        force_reload=True,
+        path=ruta_imagen)
+
+    # Realizamos deteccion
+    detect = model(cap)
+
+
+    # Muestra la imagen en una ventana
+    cv.imshow('Detector de pistolas', np.squeeze(detect.render()))
