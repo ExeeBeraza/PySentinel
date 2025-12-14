@@ -2,3 +2,4 @@
 models
 *.pt
 *.pth
+yolov5env
