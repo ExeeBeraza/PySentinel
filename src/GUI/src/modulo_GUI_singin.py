@@ -1,104 +1,255 @@
+"""
+PySentinel - Pantalla de Registro
+Registro de nuevos usuarios
+"""
+
 import tkinter as tk
 import tkinter.font as tkFont
-from tkinter import Tk, Label
-from modulo_GUI_main import Principal
+from tkinter import Tk, messagebox
+from pathlib import Path
+
+import theme
 
 
-
-#------------------
-
-
-
-
-#-------------------REGISTRO------------------------------------
 class Registro:
-    def __init__(self, root):
-        #setting title
-        self.root = root
-        self.top = tk.Toplevel(root)
+    """Pantalla de registro de usuarios"""
 
-        # Limpia los widgets existentes de la ventana principal
+    def __init__(self, root):
+        self.root = root
+        self.setup_window()
+        self.create_widgets()
+
+    def setup_window(self):
+        """Configura la ventana"""
         for widget in self.root.winfo_children():
             widget.destroy()
 
-        self.root.title("login")
-        #setting window size
-        width=524
-        height=477
-        screenwidth = root.winfo_screenwidth()
-        screenheight = root.winfo_screenheight()
-        alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
-        self.root.geometry(alignstr)
-        self.root.resizable(width=False, height=False)
+        theme.configure_window(self.root, "PySentinel - Crear Cuenta")
 
-        GLabel_812=tk.Label(root)
-        ft = tkFont.Font(family='Times',size=45)
-        GLabel_812["font"] = ft
-        GLabel_812["fg"] = "#333333"
-        GLabel_812["justify"] = "center"
-        GLabel_812["text"] = "Registrarse"
-        GLabel_812.place(x=0,y=0,width=370,height=64)
+    def create_widgets(self):
+        """Crea todos los widgets"""
+        # Contenedor principal centrado
+        main_frame = tk.Frame(self.root, bg=theme.PRIMARY)
+        main_frame.pack(fill="both", expand=True)
 
-        GLineEdit_676=tk.Entry(root)
-        GLineEdit_676["borderwidth"] = "1px"
-        ft = tkFont.Font(family='Times',size=10)
-        GLineEdit_676["font"] = ft
-        GLineEdit_676["fg"] = "#333333"
-        GLineEdit_676["justify"] = "left"
-        GLineEdit_676.insert(0, "Ingrese su nombre de usuario")
-        GLineEdit_676.place(x=30,y=85,width=470,height=30)
+        # Card de registro centrada
+        card_frame = tk.Frame(main_frame, bg=theme.BG_CARD, padx=50, pady=35)
+        card_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-        GLineEdit_534=tk.Entry(root)
-        GLineEdit_534["borderwidth"] = "1px"
-        ft = tkFont.Font(family='Times',size=10)
-        GLineEdit_534["font"] = ft
-        GLineEdit_534["fg"] = "#333333"
-        GLineEdit_534["justify"] = "left"
-        GLineEdit_534.insert(0, "Ingrese su Nombre")
-        GLineEdit_534.place(x=30,y=150,width=470,height=30)
+        # Header del card
+        header = tk.Frame(card_frame, bg=theme.BG_CARD)
+        header.pack(fill="x", pady=(0, 20))
 
-        GLineEdit_715=tk.Entry(root)
-        GLineEdit_715["borderwidth"] = "1px"
-        ft = tkFont.Font(family='Times',size=10)
-        GLineEdit_715["font"] = ft
-        GLineEdit_715["fg"] = "#333333"
-        GLineEdit_715["justify"] = "left"
-        GLineEdit_715.insert(0, "Ingrese su email")
-        GLineEdit_715.place(x=30,y=210,width=469,height=30)
+        # Icono
+        icon_font = tkFont.Font(size=45)
+        icon = tk.Label(
+            header,
+            text="📝",
+            font=icon_font,
+            bg=theme.BG_CARD
+        )
+        icon.pack()
 
-        GButton_282=tk.Button(root)
-        GButton_282["bg"] = "#f0f0f0"
-        ft = tkFont.Font(family='Times',size=10)
-        GButton_282["font"] = ft
-        GButton_282["fg"] = "#1e9fff"
-        GButton_282["justify"] = "center"
-        GButton_282["text"] = "Registrarse"
-        GButton_282.place(x=230,y=390,width=70,height=25)
-        GButton_282["command"] = self.GButton_282_command
+        # Título
+        title_font = tkFont.Font(family=theme.FONT_FAMILY_TITLE, size=26, weight="bold")
+        title = tk.Label(
+            header,
+            text="Crear Cuenta",
+            font=title_font,
+            bg=theme.BG_CARD,
+            fg=theme.TEXT_PRIMARY
+        )
+        title.pack(pady=(8, 3))
 
-        GLineEdit_842=tk.Entry(root, show = "*")
-        GLineEdit_842["borderwidth"] = "1px"
-        ft = tkFont.Font(family='Times',size=10)
-        GLineEdit_842["font"] = ft
-        GLineEdit_842["fg"] = "#333333"
-        GLineEdit_842["justify"] = "left"
-        GLineEdit_842.insert(0, "Ingrese su contraseña")
-        GLineEdit_842.place(x=30,y=270,width=469,height=30)
+        # Subtítulo
+        subtitle_font = tkFont.Font(family=theme.FONT_FAMILY, size=11)
+        subtitle = tk.Label(
+            header,
+            text="Completa los datos para registrarte",
+            font=subtitle_font,
+            bg=theme.BG_CARD,
+            fg=theme.TEXT_SECONDARY
+        )
+        subtitle.pack()
 
-        GLabel_443=tk.Label(root)
-        ft = tkFont.Font(family='Times',size=10)
-        GLabel_443["font"] = ft
-        GLabel_443["fg"] = "#333333"
-        GLabel_443["justify"] = "center"
-        GLabel_443["text"] = "___________________________________________________________________________________"
-        GLabel_443.place(x=30,y=330,width=466,height=38)
+        # Formulario
+        form_frame = tk.Frame(card_frame, bg=theme.BG_CARD)
+        form_frame.pack(fill="x", pady=5)
 
-    def GButton_282_command(self):
-        Principal(self.root)    #instancia propia de esta funcion comando del boton
-        
-        
-        
+        label_font = tkFont.Font(family=theme.FONT_FAMILY, size=10)
+        entry_font = tkFont.Font(family=theme.FONT_FAMILY, size=11)
+
+        # Campos del formulario
+        fields = [
+            ("👤", "Nombre de usuario", False, "username"),
+            ("📛", "Nombre completo", False, "nombre"),
+            ("📧", "Correo electrónico", False, "email"),
+            ("🔒", "Contraseña", True, "password"),
+            ("🔒", "Confirmar contraseña", True, "password_confirm"),
+        ]
+
+        self.entries = {}
+
+        for icon, label_text, is_password, field_id in fields:
+            field_frame = tk.Frame(form_frame, bg=theme.BG_CARD)
+            field_frame.pack(fill="x", pady=6)
+
+            label = tk.Label(
+                field_frame,
+                text=f"{icon}  {label_text}",
+                font=label_font,
+                bg=theme.BG_CARD,
+                fg=theme.TEXT_SECONDARY
+            )
+            label.pack(anchor="w")
+
+            entry = tk.Entry(
+                field_frame,
+                font=entry_font,
+                width=35,
+                show="•" if is_password else "",
+                **theme.get_entry_style()
+            )
+            entry.pack(fill="x", pady=(3, 0), ipady=10)
+
+            self.entries[field_id] = entry
+
+        # Checkbox términos y condiciones
+        terms_frame = tk.Frame(card_frame, bg=theme.BG_CARD)
+        terms_frame.pack(fill="x", pady=(15, 5))
+
+        self.terms_var = tk.BooleanVar()
+        terms_check = tk.Checkbutton(
+            terms_frame,
+            text=" Acepto los términos y condiciones",
+            variable=self.terms_var,
+            font=label_font,
+            bg=theme.BG_CARD,
+            fg=theme.TEXT_SECONDARY,
+            activebackground=theme.BG_CARD,
+            activeforeground=theme.TEXT_PRIMARY,
+            selectcolor=theme.BG_INPUT
+        )
+        terms_check.pack(anchor="w")
+
+        # Botón de registro
+        btn_frame = tk.Frame(card_frame, bg=theme.BG_CARD)
+        btn_frame.pack(fill="x", pady=(15, 10))
+
+        btn_font = tkFont.Font(family=theme.FONT_FAMILY, size=13, weight="bold")
+        btn_registro = tk.Button(
+            btn_frame,
+            text="Crear Cuenta",
+            font=btn_font,
+            command=self.registrar,
+            **theme.get_accent_button_style()
+        )
+        btn_registro.pack(fill="x", ipady=10)
+
+        # Link de login
+        login_frame = tk.Frame(card_frame, bg=theme.BG_CARD)
+        login_frame.pack(pady=10)
+
+        login_text = tk.Label(
+            login_frame,
+            text="¿Ya tienes cuenta?",
+            font=label_font,
+            bg=theme.BG_CARD,
+            fg=theme.TEXT_SECONDARY
+        )
+        login_text.pack(side="left")
+
+        login_link = tk.Label(
+            login_frame,
+            text=" Inicia sesión",
+            font=label_font,
+            bg=theme.BG_CARD,
+            fg=theme.ACCENT,
+            cursor="hand2"
+        )
+        login_link.pack(side="left")
+        login_link.bind("<Button-1>", lambda e: self.ir_login())
+
+        # Botón volver
+        btn_volver_frame = tk.Frame(card_frame, bg=theme.BG_CARD)
+        btn_volver_frame.pack(pady=(10, 0))
+
+        btn_volver_font = tkFont.Font(family=theme.FONT_FAMILY, size=10)
+        btn_volver = tk.Button(
+            btn_volver_frame,
+            text="← Volver al inicio",
+            font=btn_volver_font,
+            command=self.volver,
+            **theme.get_button_style()
+        )
+        btn_volver.pack(ipadx=12, ipady=6)
+
+    # =========================================================================
+    # ACCIONES
+    # =========================================================================
+
+    def registrar(self):
+        """Procesa el registro del usuario"""
+        # Obtener valores
+        username = self.entries["username"].get()
+        nombre = self.entries["nombre"].get()
+        email = self.entries["email"].get()
+        password = self.entries["password"].get()
+        password_confirm = self.entries["password_confirm"].get()
+
+        # Validaciones básicas
+        if not all([username, nombre, email, password, password_confirm]):
+            messagebox.showwarning(
+                "Campos incompletos",
+                "Por favor completa todos los campos"
+            )
+            return
+
+        if password != password_confirm:
+            messagebox.showerror(
+                "Error",
+                "Las contraseñas no coinciden"
+            )
+            return
+
+        if not self.terms_var.get():
+            messagebox.showwarning(
+                "Términos y condiciones",
+                "Debes aceptar los términos y condiciones"
+            )
+            return
+
+        print(f"✅ Usuario registrado: {username}")
+
+        messagebox.showinfo(
+            "Registro exitoso",
+            f"¡Bienvenido {nombre}!\nTu cuenta ha sido creada exitosamente."
+        )
+
+        # Ir a la pantalla principal
+        self.ir_principal()
+
+    def ir_principal(self):
+        """Navega a la pantalla principal"""
+        from modulo_GUI_main import Principal
+        Principal(self.root)
+
+    def ir_login(self):
+        """Navega a la pantalla de login"""
+        from modulo_GUI_login import Login
+        Login(self.root)
+
+    def volver(self):
+        """Vuelve a la pantalla de inicio"""
+        from modulo_GUI_Inicio import Inicio
+        Inicio(self.root)
+
+
+# =============================================================================
+# PUNTO DE ENTRADA
+# =============================================================================
+
 if __name__ == "__main__":
-    root = tk.Tk()
-    reg = Registro(root)
+    root = Tk()
+    app = Registro(root)
     root.mainloop()

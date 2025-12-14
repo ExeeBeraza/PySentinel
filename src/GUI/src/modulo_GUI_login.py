@@ -1,118 +1,267 @@
-import os
+"""
+PySentinel - Pantalla de Login
+Inicio de sesión de usuarios
+"""
+
 import tkinter as tk
 import tkinter.font as tkFont
-from modulo_GUI_singin import Registro
-from modulo_GUI_main import Principal
-from PIL import Image, ImageTk  # Para manejar imágenes
+from tkinter import Tk, messagebox
+from pathlib import Path
 
+import theme
 
-
-#-------------------------------------------------------------
-
-#----------------------------INCIO DE SESION-----------------------------------
 
 class Login:
+    """Pantalla de inicio de sesión"""
+
     def __init__(self, root):
         self.root = root
+        self.setup_window()
+        self.create_widgets()
 
-        # Limpia los widgets existentes de la ventana principal
+    def setup_window(self):
+        """Configura la ventana"""
         for widget in self.root.winfo_children():
             widget.destroy()
 
-        #setting title
-        self.root.title("login")
-        #setting window size
-        width=600
-        height=500
-        screenwidth = root.winfo_screenwidth()
-        screenheight = root.winfo_screenheight()
-        alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
-        self.root.geometry(alignstr)
-        self.root.resizable(width=False, height=False)
+        theme.configure_window(self.root, "PySentinel - Iniciar Sesión")
 
-        GLabel_426=tk.Label(root)
-        ft = tkFont.Font(family='Times',size=13)
-        GLabel_426["font"] = ft
-        GLabel_426["fg"] = "#1e9fff"
-        GLabel_426["justify"] = "center"
-        GLabel_426["text"] = "¿No tienes una cuenta?"
-        GLabel_426.place(x=200,y=350,width=169,height=30)
+    def create_widgets(self):
+        """Crea todos los widgets"""
+        # Contenedor principal centrado
+        main_frame = tk.Frame(self.root, bg=theme.PRIMARY)
+        main_frame.pack(fill="both", expand=True)
 
-        GLabel_74=tk.Label(root)
-        ft = tkFont.Font(family='Times',size=10)
-        GLabel_74["font"] = ft
-        GLabel_74["fg"] = "#333333"
-        GLabel_74["justify"] = "center"
-        GLabel_74["text"] = "___________________________________________________________________________________________________"
-        GLabel_74.place(x=20,y=370,width=562,height=42)
+        # Card de login centrada
+        card_frame = tk.Frame(main_frame, bg=theme.BG_CARD, padx=50, pady=40)
+        card_frame.place(relx=0.5, rely=0.5, anchor="center")
 
-        GButton_705=tk.Button(root)
-        GButton_705["bg"] = "#f0f0f0"
-        ft = tkFont.Font(family='Times',size=10)
-        GButton_705["font"] = ft
-        GButton_705["fg"] = "#1e9fff"
-        GButton_705["justify"] = "center"
-        GButton_705["text"] = "Iniciar"
-        GButton_705.place(x=240,y=460,width=70,height=25)
-        GButton_705["command"] = self.GButton_705_command
+        # Header del card
+        header = tk.Frame(card_frame, bg=theme.BG_CARD)
+        header.pack(fill="x", pady=(0, 30))
 
-        GButton_614=tk.Button(root)
-        GButton_614["bg"] = "#f0f0f0"
-        ft = tkFont.Font(family='Times',size=10)
-        GButton_614["font"] = ft
-        GButton_614["fg"] = "#1e9fff"
-        GButton_614["justify"] = "center"
-        GButton_614["text"] = "Registrarse"
-        GButton_614.place(x=460,y=360,width=70,height=25)
-        GButton_614["command"] = self.GButton_614_command
+        # Icono
+        icon_font = tkFont.Font(size=50)
+        icon = tk.Label(
+            header,
+            text="🔐",
+            font=icon_font,
+            bg=theme.BG_CARD
+        )
+        icon.pack()
 
-        GLineEdit_497=tk.Entry(root, show = "*")
-        GLineEdit_497["borderwidth"] = "1px"
-        ft = tkFont.Font(family='Times',size=10)
-        GLineEdit_497["font"] = ft
-        GLineEdit_497["fg"] = "#333333"
-        GLineEdit_497["justify"] = "center"
-        GLineEdit_497.insert(0, "Ingrese su contraseña")
-        GLineEdit_497.place(x=80,y=210,width=411,height=30)
+        # Título
+        title_font = tkFont.Font(family=theme.FONT_FAMILY_TITLE, size=28, weight="bold")
+        title = tk.Label(
+            header,
+            text="Iniciar Sesión",
+            font=title_font,
+            bg=theme.BG_CARD,
+            fg=theme.TEXT_PRIMARY
+        )
+        title.pack(pady=(10, 5))
 
-        GLineEdit_133=tk.Entry(root)
-        GLineEdit_133["borderwidth"] = "1px"
-        ft = tkFont.Font(family='Times',size=10)
-        GLineEdit_133["font"] = ft
-        GLineEdit_133["fg"] = "#333333"
-        GLineEdit_133["justify"] = "center"
-        GLineEdit_133.insert(0, "Ingrese su nombre de usuario")
-        GLineEdit_133.place(x=80,y=110,width=419,height=34)
+        # Subtítulo
+        subtitle_font = tkFont.Font(family=theme.FONT_FAMILY, size=12)
+        subtitle = tk.Label(
+            header,
+            text="Ingresa tus credenciales para continuar",
+            font=subtitle_font,
+            bg=theme.BG_CARD,
+            fg=theme.TEXT_SECONDARY
+        )
+        subtitle.pack()
 
-        GLabel_504=tk.Label(root)
-        ft = tkFont.Font(family='Times',size=48)
-        GLabel_504["font"] = ft
-        GLabel_504["fg"] = "#333333"
-        GLabel_504["justify"] = "center"
-        GLabel_504["text"] = "Inicio de Sesión"
-        GLabel_504.place(x=20,y=20,width=408,height=64)
+        # Formulario
+        form_frame = tk.Frame(card_frame, bg=theme.BG_CARD)
+        form_frame.pack(fill="x", pady=10)
 
-    def GButton_705_command(self):
-        Principal(self.root)  # instancia propia de esta funcion comando del boton
+        label_font = tkFont.Font(family=theme.FONT_FAMILY, size=11)
+        entry_font = tkFont.Font(family=theme.FONT_FAMILY, size=12)
 
-    def GButton_614_command(self):
-        Registro(self.root)    #instancia propia de esta funcion comando del boton
+        # Campo Usuario
+        user_frame = tk.Frame(form_frame, bg=theme.BG_CARD)
+        user_frame.pack(fill="x", pady=10)
 
+        user_label = tk.Label(
+            user_frame,
+            text="👤  Usuario",
+            font=label_font,
+            bg=theme.BG_CARD,
+            fg=theme.TEXT_SECONDARY
+        )
+        user_label.pack(anchor="w")
+
+        self.entry_usuario = tk.Entry(
+            user_frame,
+            font=entry_font,
+            width=35,
+            **theme.get_entry_style()
+        )
+        self.entry_usuario.pack(fill="x", pady=(5, 0), ipady=12)
+        self.entry_usuario.insert(0, "")
+
+        # Campo Contraseña
+        pass_frame = tk.Frame(form_frame, bg=theme.BG_CARD)
+        pass_frame.pack(fill="x", pady=10)
+
+        pass_label = tk.Label(
+            pass_frame,
+            text="🔒  Contraseña",
+            font=label_font,
+            bg=theme.BG_CARD,
+            fg=theme.TEXT_SECONDARY
+        )
+        pass_label.pack(anchor="w")
+
+        self.entry_password = tk.Entry(
+            pass_frame,
+            font=entry_font,
+            width=35,
+            show="•",
+            **theme.get_entry_style()
+        )
+        self.entry_password.pack(fill="x", pady=(5, 0), ipady=12)
+
+        # Link olvidé contraseña
+        forgot_font = tkFont.Font(family=theme.FONT_FAMILY, size=10)
+        forgot_link = tk.Label(
+            form_frame,
+            text="¿Olvidaste tu contraseña?",
+            font=forgot_font,
+            bg=theme.BG_CARD,
+            fg=theme.ACCENT,
+            cursor="hand2"
+        )
+        forgot_link.pack(anchor="e", pady=(5, 0))
+
+        # Botón de login
+        btn_frame = tk.Frame(card_frame, bg=theme.BG_CARD)
+        btn_frame.pack(fill="x", pady=(25, 15))
+
+        btn_font = tkFont.Font(family=theme.FONT_FAMILY, size=14, weight="bold")
+        btn_login = tk.Button(
+            btn_frame,
+            text="Iniciar Sesión",
+            font=btn_font,
+            command=self.iniciar_sesion,
+            **theme.get_accent_button_style()
+        )
+        btn_login.pack(fill="x", ipady=12)
+
+        # Separador
+        separator_frame = tk.Frame(card_frame, bg=theme.BG_CARD)
+        separator_frame.pack(fill="x", pady=15)
+
+        sep_line1 = tk.Frame(separator_frame, bg=theme.BORDER_COLOR, height=1)
+        sep_line1.pack(side="left", fill="x", expand=True)
+
+        sep_text = tk.Label(
+            separator_frame,
+            text="  o  ",
+            font=forgot_font,
+            bg=theme.BG_CARD,
+            fg=theme.TEXT_MUTED
+        )
+        sep_text.pack(side="left")
+
+        sep_line2 = tk.Frame(separator_frame, bg=theme.BORDER_COLOR, height=1)
+        sep_line2.pack(side="left", fill="x", expand=True)
+
+        # Link de registro
+        register_frame = tk.Frame(card_frame, bg=theme.BG_CARD)
+        register_frame.pack(pady=10)
+
+        register_text = tk.Label(
+            register_frame,
+            text="¿No tienes cuenta?",
+            font=label_font,
+            bg=theme.BG_CARD,
+            fg=theme.TEXT_SECONDARY
+        )
+        register_text.pack(side="left")
+
+        register_link = tk.Label(
+            register_frame,
+            text=" Regístrate",
+            font=label_font,
+            bg=theme.BG_CARD,
+            fg=theme.ACCENT,
+            cursor="hand2"
+        )
+        register_link.pack(side="left")
+        register_link.bind("<Button-1>", lambda e: self.ir_registro())
+
+        # Botón volver
+        btn_volver_frame = tk.Frame(card_frame, bg=theme.BG_CARD)
+        btn_volver_frame.pack(pady=(20, 0))
+
+        btn_volver_font = tkFont.Font(family=theme.FONT_FAMILY, size=11)
+        btn_volver = tk.Button(
+            btn_volver_frame,
+            text="← Volver al inicio",
+            font=btn_volver_font,
+            command=self.volver,
+            **theme.get_button_style()
+        )
+        btn_volver.pack(ipadx=15, ipady=8)
+
+    # =========================================================================
+    # ACCIONES
+    # =========================================================================
 
     def iniciar_sesion(self):
-        print("Iniciar sesión presionado")
+        """Procesa el inicio de sesión"""
+        usuario = self.entry_usuario.get()
+        password = self.entry_password.get()
+
+        # Usuario de prueba hardcodeado
+        USUARIOS_TEST = {
+            "admin": "admin",
+        }
+
+        if not usuario or not password:
+            messagebox.showwarning(
+                "Campos vacíos",
+                "Por favor ingresa tu usuario y contraseña"
+            )
+            return
+
+        # Validar credenciales
+        if usuario in USUARIOS_TEST and USUARIOS_TEST[usuario] == password:
+            print(f"✅ Iniciando sesión como: {usuario}")
+            messagebox.showinfo(
+                "Bienvenido",
+                f"¡Hola {usuario}! Has iniciado sesión correctamente."
+            )
+            self.ir_principal()
+        else:
+            messagebox.showerror(
+                "Error de autenticación",
+                "Usuario o contraseña incorrectos.\n\nUsuario de prueba: admin / admin"
+            )
+
+    def ir_principal(self):
+        """Navega a la pantalla principal"""
+        from modulo_GUI_main import Principal
+        Principal(self.root)
+
+    def ir_registro(self):
+        """Navega a la pantalla de registro"""
+        from modulo_GUI_singin import Registro
+        Registro(self.root)
 
     def volver(self):
-        from modulo_GUI_Inicio import Inicio  # Importación local para evitar bucles de importación
-        ruta_imagen = "/home/exequiel/Documentos/WeaponEyEdetecting_/WED_/src/GUI/resource/main_image.jpg"
-        Inicio(self.root, ruta_imagen)  # Redibuja la ventana de inicio
+        """Vuelve a la pantalla de inicio"""
+        from modulo_GUI_Inicio import Inicio
+        Inicio(self.root)
 
 
+# =============================================================================
+# PUNTO DE ENTRADA
+# =============================================================================
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    login = Login(root)
+    root = Tk()
+    app = Login(root)
     root.mainloop()
-
-
-

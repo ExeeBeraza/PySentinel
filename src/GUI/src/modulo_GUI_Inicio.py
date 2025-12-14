@@ -1,137 +1,212 @@
-import os
+"""
+PySentinel - Pantalla de Inicio (Welcome)
+Primera pantalla que ve el usuario al abrir la aplicación
+"""
+
 import tkinter as tk
 import tkinter.font as tkFont
 from tkinter import Tk
 from PIL import Image, ImageTk
-from modulo_GUI_login import Login
+from pathlib import Path
+
+import theme
 
 
 class Inicio:
-    def __init__(self, root, ruta_imagen):
+    """Pantalla de bienvenida de la aplicación"""
+
+    def __init__(self, root):
         self.root = root
-        self.ruta_imagen = ruta_imagen
+        self.setup_window()
+        self.load_resources()
+        self.create_widgets()
 
-        # Título
-        self.root.title("¡Bienvenidos!")
+    def setup_window(self):
+        """Configura la ventana"""
+        for widget in self.root.winfo_children():
+            widget.destroy()
 
-        # Cargar imagen
-        img = Image.open(self.ruta_imagen)
-        self.photo = ImageTk.PhotoImage(img)
+        theme.configure_window(self.root, "PySentinel - Bienvenido")
 
-        # Tamaño ventana
-        width, height = 649, 556
-        screenwidth = root.winfo_screenwidth()
-        screenheight = root.winfo_screenheight()
-        alignstr = '%dx%d+%d+%d' % (width, height,
-                                    (screenwidth - width) / 2,
-                                    (screenheight - height) / 2)
-        self.root.geometry(alignstr)
-        self.root.resizable(width=False, height=False)
+    def load_resources(self):
+        """Carga imágenes y recursos"""
+        base_dir = Path(__file__).resolve().parent
+        resource_dir = base_dir.parent / "resources"
 
-        # Botón
-        GButton_973 = tk.Button(root, text="Identificarse",
-                                font=tkFont.Font(family='Times', size=10),
-                                bg="#f0f0f0", fg="#000000",
-                                relief="sunken", cursor="spraycan",
-                                command=self.GButton_973_command)
-        GButton_973.place(x=510, y=10, width=115, height=30)
+        # Intentar cargar imagen de fondo
+        self.bg_image = None
+        bg_path = resource_dir / "_85001311-a3ad-476c-ae4c-db32a1115050.jpg"
 
-        # Imagen
-        GLabel_909 = tk.Label(root, image=self.photo,
-                              font=tkFont.Font(family='Times', size=10),
-                              fg="#333333", justify="center")
-        GLabel_909.place(x=10, y=40, width=639, height=512)
+        if bg_path.exists():
+            img = Image.open(bg_path)
+            # Redimensionar manteniendo aspecto
+            img = img.resize((400, 300), Image.Resampling.LANCZOS)
+            self.bg_image = ImageTk.PhotoImage(img)
 
-    def GButton_973_command(self):
+    def create_widgets(self):
+        """Crea todos los widgets"""
+        # Contenedor principal
+        main_frame = tk.Frame(self.root, bg=theme.PRIMARY)
+        main_frame.pack(fill="both", expand=True)
+
+        # Sección superior - Logo y título
+        header_section = tk.Frame(main_frame, bg=theme.PRIMARY)
+        header_section.pack(fill="x", pady=(40, 20))
+
+        # Logo/Icono grande
+        logo_font = tkFont.Font(size=50)
+        logo = tk.Label(
+            header_section,
+            text="🔫",
+            font=logo_font,
+            bg=theme.PRIMARY,
+            fg=theme.TEXT_PRIMARY
+        )
+        logo.pack()
+
+        # Título principal
+        title_font = tkFont.Font(family=theme.FONT_FAMILY_TITLE, size=36, weight="bold")
+        title = tk.Label(
+            header_section,
+            text="PySentinel",
+            font=title_font,
+            bg=theme.PRIMARY,
+            fg=theme.TEXT_PRIMARY
+        )
+        title.pack(pady=(10, 5))
+
+        # Subtítulo
+        subtitle_font = tkFont.Font(family=theme.FONT_FAMILY, size=16)
+        subtitle = tk.Label(
+            header_section,
+            text="Sistema de Detección de Armas con IA",
+            font=subtitle_font,
+            bg=theme.PRIMARY,
+            fg=theme.TEXT_SECONDARY
+        )
+        subtitle.pack()
+
+        # Sección de características
+        features_frame = tk.Frame(main_frame, bg=theme.PRIMARY)
+        features_frame.pack(pady=20)
+
+        features = [
+            ("🎯", "Detección precisa", "Powered by YOLOv5"),
+            ("⚡", "Análisis rápido", "Resultados en segundos"),
+            ("🔒", "Seguro", "Procesamiento local"),
+        ]
+
+        for icon, title_text, desc in features:
+            feature_card = tk.Frame(features_frame, bg=theme.BG_CARD, padx=25, pady=20)
+            feature_card.pack(side="left", padx=10)
+
+            # Icono
+            icon_font = tkFont.Font(size=28)
+            icon_label = tk.Label(
+                feature_card,
+                text=icon,
+                font=icon_font,
+                bg=theme.BG_CARD
+            )
+            icon_label.pack()
+
+            # Título de característica
+            feat_title_font = tkFont.Font(family=theme.FONT_FAMILY, size=12, weight="bold")
+            feat_title = tk.Label(
+                feature_card,
+                text=title_text,
+                font=feat_title_font,
+                bg=theme.BG_CARD,
+                fg=theme.TEXT_PRIMARY
+            )
+            feat_title.pack(pady=(8, 2))
+
+            # Descripción
+            feat_desc_font = tkFont.Font(family=theme.FONT_FAMILY, size=10)
+            feat_desc = tk.Label(
+                feature_card,
+                text=desc,
+                font=feat_desc_font,
+                bg=theme.BG_CARD,
+                fg=theme.TEXT_MUTED
+            )
+            feat_desc.pack()
+
+        # Sección de botones
+        btn_section = tk.Frame(main_frame, bg=theme.PRIMARY)
+        btn_section.pack(pady=30)
+
+        btn_font = tkFont.Font(family=theme.FONT_FAMILY, size=14, weight="bold")
+
+        # Contenedor de botones lado a lado
+        btn_container = tk.Frame(btn_section, bg=theme.PRIMARY)
+        btn_container.pack()
+
+        # Botón Iniciar Sesión
+        btn_login = tk.Button(
+            btn_container,
+            text="🔐  Iniciar Sesión",
+            font=btn_font,
+            command=self.ir_login,
+            **theme.get_accent_button_style()
+        )
+        btn_login.pack(side="left", padx=10, ipadx=30, ipady=15)
+
+        # Botón Registrarse
+        btn_registro = tk.Button(
+            btn_container,
+            text="📝  Crear Cuenta",
+            font=btn_font,
+            command=self.ir_registro,
+            **theme.get_button_style()
+        )
+        btn_registro.pack(side="left", padx=10, ipadx=30, ipady=15)
+
+        # Texto informativo
+        info_font = tkFont.Font(family=theme.FONT_FAMILY, size=11)
+        info_text = tk.Label(
+            btn_section,
+            text="Inicia sesión o crea una cuenta para comenzar a usar PySentinel",
+            font=info_font,
+            bg=theme.PRIMARY,
+            fg=theme.TEXT_MUTED
+        )
+        info_text.pack(pady=(20, 0))
+
+        # Footer
+        footer = tk.Frame(main_frame, bg=theme.PRIMARY)
+        footer.pack(side="bottom", fill="x", pady=20)
+
+        footer_font = tkFont.Font(family=theme.FONT_FAMILY, size=10)
+        footer_text = tk.Label(
+            footer,
+            text="© 2024 PySentinel | Detección inteligente de armas",
+            font=footer_font,
+            bg=theme.PRIMARY,
+            fg=theme.TEXT_MUTED
+        )
+        footer_text.pack()
+
+    # =========================================================================
+    # ACCIONES
+    # =========================================================================
+
+    def ir_login(self):
+        """Navega a la pantalla de login"""
+        from modulo_GUI_login import Login
         Login(self.root)
 
+    def ir_registro(self):
+        """Navega a la pantalla de registro"""
+        from modulo_GUI_singin import Registro
+        Registro(self.root)
+
+
+# =============================================================================
+# PUNTO DE ENTRADA
+# =============================================================================
 
 if __name__ == "__main__":
-    # Construir ruta absoluta a la imagen
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    ruta_imagen = os.path.join(BASE_DIR, "..", "resource", "main_image.jpg")
-
-    root = tk.Tk()
-    inicio = Inicio(root, ruta_imagen)
+    root = Tk()
+    app = Inicio(root)
     root.mainloop()
-
-"""
-import os
-import tkinter as tk
-import tkinter.font as tkFont
-from tkinter import Tk, Label
-from PIL import Image, ImageTk  # Para manejar imágenes
-from modulo_GUI_login import Login
-
-
-
-
-
-#TODO: @archivo por cada ventana
-
-
-
-
-# archivo de como manual de instalar bilbiotecas o readme algo sencillo una guia README o bien un doc
-#--------------------------INICIO
-class Inicio:
-    def __init__(self, root, ruta_imagen):
-        self.root = root
-        self.ruta_imagen = ruta_imagen
-
-        #setting title
-        self.root.title("¡Bienvenidos!")
-        img = Image.open(ruta_imagen)
-        self.photo = ImageTk.PhotoImage(img)
-        #setting window size
-        width=649
-        height=556
-        screenwidth = root.winfo_screenwidth()
-        screenheight = root.winfo_screenheight()
-        alignstr = '%dx%d+%d+%d' % (width, height, (screenwidth - width) / 2, (screenheight - height) / 2)
-        self.root.geometry(alignstr)
-        self.root.resizable(width=False, height=False)
-
-        GButton_973=tk.Button(root)
-        GButton_973["anchor"] = "center"
-        GButton_973["bg"] = "#f0f0f0"
-        GButton_973["cursor"] = "spraycan"
-        ft = tkFont.Font(family='Times',size=10)
-        GButton_973["font"] = ft
-        GButton_973["fg"] = "#000000"
-        GButton_973["justify"] = "center"
-        GButton_973["text"] = "Identificarse"
-        GButton_973["relief"] = "sunken"
-        GButton_973.place(x=510,y=10,width=115,height=30)
-        GButton_973["command"] = self.GButton_973_command
-
-        GLabel_909=tk.Label(root)
-        ft = tkFont.Font(family='Times',size=10)
-        GLabel_909["font"] = ft
-        GLabel_909["fg"] = "#333333"
-        GLabel_909["justify"] = "center"
-        GLabel_909["image"] = self.photo
-        GLabel_909.place(x=10,y=40,width=639,height=512)
-
-        try:
-            etiqueta_imagen = tk.Label(Inicio, image=img_tk)
-            etiqueta_imagen.image = img_tk  # Necesario para mantener la referencia a la imagen
-            etiqueta_imagen.pack()
-        except Exception as e:
-            tk.Label(Inicio, text=f"Error al cargar la imagen: {e}").pack()
-
-    def GButton_973_command(self):
-        Login(self.root)#instancia propia de esta funcion comando del boton
-
-
-
-if __name__ == "__main__":
-    ruta_imagen = "src/GUI/resource/main_image.jpg"
-    root = tk.Tk()
-    inicio = Inicio(root, ruta_imagen)
-    root.mainloop()
-
-
-
-"""
-

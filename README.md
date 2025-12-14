@@ -208,4 +208,6 @@ python modulo_GUI_main.py
 
 ---
 
-*Basado en el proyecto original de Roberto Axel Valenzuela Padilla (2013)*
+# Procedimiento para entrenar un modelo personalizado
+
+https://www.youtube.com/watch?v=Hb5xHY4e2Mg
