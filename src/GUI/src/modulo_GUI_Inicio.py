@@ -31,7 +31,7 @@ class Inicio:
     def load_resources(self):
         """Carga imágenes y recursos"""
         base_dir = Path(__file__).resolve().parent
-        resource_dir = base_dir.parent / "resource"
+        resource_dir = base_dir.parent / "resources"
 
         # Intentar cargar imagen de fondo
         self.bg_image = None
