@@ -83,8 +83,8 @@ class Principal:
 
     def GButton_534_command(self):
         print("commaasdfasdnd")
-        
-        
+
+
 
 
 if __name__ == "__main__":
@@ -101,10 +101,16 @@ import tkinter as tk
 import tkinter.font as tkFont
 from tkinter import Tk
 from PIL import Image, ImageTk
+import sys
+
+# Agregar el directorio src al path para poder importar módulos
+src_dir = Path(__file__).resolve().parent.parent.parent  # Sube de src/GUI/src a src/
+sys.path.insert(0, str(src_dir))
+
 # from modulo_GUI_singin import Registro
 from modulo_GUI_Perfil import Perfil
 from modulo_GUI_historial import Historial
-from src.pistola.detect import detectar_pistola
+from pistola.detect import detectar_pistola
 
 
 #--------------------------PRINCIPAL--------------------------------------------
