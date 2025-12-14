@@ -1,2 +1,0 @@
-CREATE DATABASE SistemaDeteccionArmas;
-USE SistemaDeteccionArmas;

@@ -21,3 +21,6 @@ tqdm>=4.60.0
 PyYAML>=5.4
 requests>=2.25.0
 
+# Base de datos MySQL
+mysql-connector-python>=8.0.0
+
