@@ -104,7 +104,7 @@ class Login:
 
     def volver(self):
         from modulo_GUI_Inicio import Inicio  # Importación local para evitar bucles de importación
-        ruta_imagen = "/home/exequiel/Documentos/WeaponEyEdetecting_/WED_/src/GUI/resource/_85001311-a3ad-476c-ae4c-db32a1115050.jpg"
+        ruta_imagen = "/home/exequiel/Documentos/WeaponEyEdetecting_/WED_/src/GUI/resource/main_image.jpg"
         Inicio(self.root, ruta_imagen)  # Redibuja la ventana de inicio
 
 

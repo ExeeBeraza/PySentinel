@@ -10,12 +10,12 @@ def registrar_usuario():
     nombre = entry_nombre.get()
     correo = entry_correo.get()
     contraseña = entry_contraseña.get()
-    
+
     # Validar que los campos no estén vacíos
     if not nombre or not correo or not contraseña:
         messagebox.showerror("Error", "Todos los campos son obligatorios")
         return
-    
+
     # Conectar a la base de datos
     conexion = conectar_bd()
     if conexion is None:

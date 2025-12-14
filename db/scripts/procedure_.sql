@@ -76,8 +76,8 @@ BEGIN
 
     -- Actualizar datos del usuario
     UPDATE Usuario
-    SET Nombre = p_nombre, 
-        Correo_electrónico = p_correo, 
+    SET Nombre = p_nombre,
+        Correo_electrónico = p_correo,
         Contraseña = p_contraseña
     WHERE ID_usuario = p_id_usuario;
 END //
@@ -103,10 +103,10 @@ BEGIN
     END IF;
 
     -- Consultar el historial dentro del rango
-    SELECT h.ID_historial, 
-           u.Nombre AS Usuario, 
-           a.Fecha_hora AS Fecha_analisis, 
-           c.Tipo_arma AS Tipo_arma, 
+    SELECT h.ID_historial,
+           u.Nombre AS Usuario,
+           a.Fecha_hora AS Fecha_analisis,
+           c.Tipo_arma AS Tipo_arma,
            c.Descripcion AS Descripcion_arma
     FROM Historial h
     INNER JOIN Analisis a ON h.ID_analisis = a.ID_analisis

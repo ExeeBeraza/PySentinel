@@ -3,6 +3,7 @@ import tkinter as tk
 import tkinter.font as tkFont
 from tkinter import Tk, Label
 from PIL import Image, ImageTk
+from pathlib import Path
 
 
 # -------------------------------------------------------------
@@ -21,8 +22,20 @@ class Perfil:
             widget.destroy()
 
         self.root.title("Perfil")
-        img = Image.open("../resource/perfil.png")
-        self.photo = ImageTk.PhotoImage(img)
+
+        # Construir ruta absoluta a la imagen
+        base_dir = Path(__file__).resolve().parent
+        resource_dir = base_dir.parent / "resource"
+        ruta_perfil = resource_dir / "perfil.png"
+
+        # Cargar imagen de perfil
+        self.photo = None
+        if ruta_perfil.exists():
+            img = Image.open(ruta_perfil)
+            img = img.resize((250, 250), Image.Resampling.LANCZOS)
+            self.photo = ImageTk.PhotoImage(img)
+        else:
+            print(f"⚠️ No se encontró: {ruta_perfil}")
         # setting window size
         width = 716
         height = 444
@@ -37,7 +50,11 @@ class Perfil:
         GLabel_856["font"] = ft
         GLabel_856["fg"] = "#333333"
         GLabel_856["justify"] = "center"
-        GLabel_856["image"] = self.photo  # foto
+        if self.photo:
+            GLabel_856["image"] = self.photo
+        else:
+            GLabel_856["text"] = "👤\nFoto de perfil"
+            GLabel_856["bg"] = "#e0e0e0"
         GLabel_856.place(x=30, y=20, width=287, height=350)
 
         GButton_813 = tk.Button(root)

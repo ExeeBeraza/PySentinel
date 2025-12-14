@@ -13,7 +13,7 @@ sys.path.insert(0, str(src_dir))
 # from modulo_GUI_singin import Registro
 from modulo_GUI_Perfil import Perfil
 from modulo_GUI_historial import Historial
-from pistola.detect import detectar_pistola
+from detectores.detect import detectar_pistola
 
 
 #--------------------------PRINCIPAL--------------------------------------------
@@ -27,30 +27,32 @@ class Principal:
 
         self.root.title("WeaponEyEdetecting")
 
-        # --- Construcción de rutas relativas ---
+        # --- Construcción de rutas a recursos ---
         base_dir = Path(__file__).resolve().parent   # carpeta donde está este archivo
         resource_dir = base_dir.parent / "resource"  # sube un nivel y entra a resource
 
-        ruta_img1 = resource_dir / "descargar.png"
-        ruta_img2 = resource_dir / "descargar (1).png"
-
-        # Depuración: imprime rutas y existencia
-        print("Ruta 1:", ruta_img1, "Existe?", ruta_img1.exists())
-        print("Ruta 2:", ruta_img2, "Existe?", ruta_img2.exists())
+        ruta_perfil = resource_dir / "perfil.png"
+        ruta_historial = resource_dir / "reloj.png"
 
         # Cargar imágenes con verificación
-        self.photo1 = None
-        self.photo2 = None
+        self.photo_perfil = None
+        self.photo_historial = None
 
-        if ruta_img1.exists():
-            self.photo1 = ImageTk.PhotoImage(Image.open(ruta_img1))
+        if ruta_perfil.exists():
+            # Redimensionar imagen para que quepa en el botón
+            img_perfil = Image.open(ruta_perfil)
+            img_perfil = img_perfil.resize((20, 20), Image.Resampling.LANCZOS)
+            self.photo_perfil = ImageTk.PhotoImage(img_perfil)
         else:
-            print("⚠️ No se encontró descargar.png")
+            print("⚠️ No se encontró perfil.png")
 
-        if ruta_img2.exists():
-            self.photo2 = ImageTk.PhotoImage(Image.open(ruta_img2))
+        if ruta_historial.exists():
+            # Redimensionar imagen para que quepa en el botón
+            img_historial = Image.open(ruta_historial)
+            img_historial = img_historial.resize((20, 20), Image.Resampling.LANCZOS)
+            self.photo_historial = ImageTk.PhotoImage(img_historial)
         else:
-            print("⚠️ No se encontró descargar (1).png")
+            print("⚠️ No se encontró reloj.png")
 
         # Configuración de ventana
         width, height = 600, 500
@@ -62,35 +64,37 @@ class Principal:
         self.root.geometry(alignstr)
         self.root.resizable(width=False, height=False)
 
-        # Botón Perfil
-        if self.photo1:
-            GButton_560 = tk.Button(root, image=self.photo1,
+        # Botón Perfil (esquina superior izquierda)
+        if self.photo_perfil:
+            GButton_560 = tk.Button(root, image=self.photo_perfil,
+                                    text=" Perfil", compound="left",
                                     bg="#f0f0f0",
                                     font=tkFont.Font(family='Times', size=10),
                                     fg="#000000", justify="center",
                                     command=self.GButton_560_command)
         else:
-            GButton_560 = tk.Button(root, text="Perfil",
+            GButton_560 = tk.Button(root, text="👤 Perfil",
                                     bg="#f0f0f0",
                                     font=tkFont.Font(family='Times', size=10),
                                     fg="#000000", justify="center",
                                     command=self.GButton_560_command)
-        GButton_560.place(x=20, y=20, width=70, height=25)
+        GButton_560.place(x=20, y=20, width=90, height=30)
 
-        # Botón Historial
-        if self.photo2:
-            GButton_759 = tk.Button(root, image=self.photo2,
+        # Botón Historial (esquina superior derecha)
+        if self.photo_historial:
+            GButton_759 = tk.Button(root, image=self.photo_historial,
+                                    text=" Historial", compound="left",
                                     bg="#f0f0f0",
                                     font=tkFont.Font(family='Times', size=10),
                                     fg="#000000", justify="center",
                                     command=self.GButton_759_command)
         else:
-            GButton_759 = tk.Button(root, text="Historial",
+            GButton_759 = tk.Button(root, text="🕐 Historial",
                                     bg="#f0f0f0",
                                     font=tkFont.Font(family='Times', size=10),
                                     fg="#000000", justify="center",
                                     command=self.GButton_759_command)
-        GButton_759.place(x=520, y=20, width=70, height=25)
+        GButton_759.place(x=490, y=20, width=100, height=30)
 
         # Botón Add Images
         GButton_534 = tk.Button(root, bg="#f0f0f0",

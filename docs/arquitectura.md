@@ -1,3 +1,0 @@
-# Arquitectura del proyecto
-
-Proximamente...

@@ -49,7 +49,7 @@ class Inicio:
 if __name__ == "__main__":
     # Construir ruta absoluta a la imagen
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    ruta_imagen = os.path.join(BASE_DIR, "..", "resource", "_85001311-a3ad-476c-ae4c-db32a1115050.jpg")
+    ruta_imagen = os.path.join(BASE_DIR, "..", "resource", "main_image.jpg")
 
     root = tk.Tk()
     inicio = Inicio(root, ruta_imagen)
@@ -94,7 +94,7 @@ class Inicio:
 
         GButton_973=tk.Button(root)
         GButton_973["anchor"] = "center"
-        GButton_973["bg"] = "#f0f0f0" 
+        GButton_973["bg"] = "#f0f0f0"
         GButton_973["cursor"] = "spraycan"
         ft = tkFont.Font(family='Times',size=10)
         GButton_973["font"] = ft
@@ -109,24 +109,24 @@ class Inicio:
         ft = tkFont.Font(family='Times',size=10)
         GLabel_909["font"] = ft
         GLabel_909["fg"] = "#333333"
-        GLabel_909["justify"] = "center"  
+        GLabel_909["justify"] = "center"
         GLabel_909["image"] = self.photo
         GLabel_909.place(x=10,y=40,width=639,height=512)
-        
+
         try:
             etiqueta_imagen = tk.Label(Inicio, image=img_tk)
             etiqueta_imagen.image = img_tk  # Necesario para mantener la referencia a la imagen
             etiqueta_imagen.pack()
         except Exception as e:
             tk.Label(Inicio, text=f"Error al cargar la imagen: {e}").pack()
-        
+
     def GButton_973_command(self):
         Login(self.root)#instancia propia de esta funcion comando del boton
 
 
 
 if __name__ == "__main__":
-    ruta_imagen = "src/GUI/resource/_85001311-a3ad-476c-ae4c-db32a1115050.jpg"
+    ruta_imagen = "src/GUI/resource/main_image.jpg"
     root = tk.Tk()
     inicio = Inicio(root, ruta_imagen)
     root.mainloop()
