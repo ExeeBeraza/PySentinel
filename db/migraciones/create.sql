@@ -1,5 +1,5 @@
-CREATE DATABASE SistemaDeteccionArmas;
-USE SistemaDeteccionArmas;
+-- CREATE DATABASE PySentinel;
+USE PySentinel;
 
 CREATE TABLE Usuario (
     ID_usuario INT AUTO_INCREMENT PRIMARY KEY,
