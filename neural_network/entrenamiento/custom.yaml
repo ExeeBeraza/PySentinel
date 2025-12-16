@@ -1,0 +1,11 @@
+train: /content/data/images/train
+val: /content/data/images/val
+test: # test images (optional)
+
+# Classes
+names:
+  0: pistola
+
+
+# Download script/URL (optional)
+download: https://github.com/ultralytics/assets/releases/download/v0.0.0/coco128.zip
