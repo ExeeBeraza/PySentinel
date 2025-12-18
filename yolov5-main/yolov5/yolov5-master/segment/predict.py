@@ -183,7 +183,7 @@ def run(
                 for j, (*xyxy, conf, cls) in enumerate(reversed(det[:, :6])):
                     if save_txt:  # Write to file
                         seg = segments[j].reshape(-1)  # (n,2) to (n*2)
-                        line = (cls, *seg, conf) if save_conf else (cls, *seg)  # label format
+                        line = (cls, *seg, conf) if save_conf else (cls, *seg)  # labels format
                         with open(f'{txt_path}.txt', 'a') as f:
                             f.write(('%g ' * len(line)).rstrip() % line + '\n')
 

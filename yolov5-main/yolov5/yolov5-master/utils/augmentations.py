@@ -198,7 +198,7 @@ def random_perspective(im,
     # ax[0].imshow(im[:, :, ::-1])  # base
     # ax[1].imshow(im2[:, :, ::-1])  # warped
 
-    # Transform label coordinates
+    # Transform labels coordinates
     n = len(targets)
     if n:
         use_segments = any(x.any() for x in segments)

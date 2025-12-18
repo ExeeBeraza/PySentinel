@@ -426,7 +426,7 @@ class LoadStreams:
 
 
 def img2label_paths(img_paths):
-    # Define label paths as a function of image paths
+    # Define labels paths as a function of image paths
     sa, sb = f'{os.sep}images{os.sep}', f'{os.sep}labels{os.sep}'  # /images/, /labels/ substrings
     return [sb.join(x.rsplit(sa, 1)).rsplit('.', 1)[0] + '.txt' for x in img_paths]
 
@@ -982,13 +982,13 @@ def autosplit(path=DATASETS_DIR / 'coco128/images', weights=(0.9, 0.1, 0.0), ann
 
     print(f'Autosplitting images from {path}' + ', using *.txt labeled images only' * annotated_only)
     for i, img in tqdm(zip(indices, files), total=n):
-        if not annotated_only or Path(img2label_paths([str(img)])[0]).exists():  # check label
+        if not annotated_only or Path(img2label_paths([str(img)])[0]).exists():  # check labels
             with open(path.parent / txt[i], 'a') as f:
                 f.write(f'./{img.relative_to(path.parent).as_posix()}' + '\n')  # add image to txt file
 
 
 def verify_image_label(args):
-    # Verify one image-label pair
+    # Verify one image-labels pair
     im_file, lb_file, prefix = args
     nm, nf, ne, nc, msg, segments = 0, 0, 0, 0, '', []  # number (missing, found, empty, corrupt), message, segments
     try:
@@ -1007,7 +1007,7 @@ def verify_image_label(args):
 
         # verify labels
         if os.path.isfile(lb_file):
-            nf = 1  # label found
+            nf = 1  # labels found
             with open(lb_file) as f:
                 lb = [x.split() for x in f.read().strip().splitlines() if len(x)]
                 if any(len(x) > 6 for x in lb):  # is segment
@@ -1027,10 +1027,10 @@ def verify_image_label(args):
                         segments = [segments[x] for x in i]
                     msg = f'{prefix}WARNING ⚠️ {im_file}: {nl - len(i)} duplicate labels removed'
             else:
-                ne = 1  # label empty
+                ne = 1  # labels empty
                 lb = np.zeros((0, 5), dtype=np.float32)
         else:
-            nm = 1  # label missing
+            nm = 1  # labels missing
             lb = np.zeros((0, 5), dtype=np.float32)
         return im_file, lb, shape, segments, nm, nf, ne, nc, msg
     except Exception as e:

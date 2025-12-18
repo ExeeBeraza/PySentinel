@@ -84,18 +84,18 @@ class Annotator:
         self.lw = line_width or max(round(sum(im.shape) / 2 * 0.003), 2)  # line width
 
     def box_label(self, box, label='', color=(128, 128, 128), txt_color=(255, 255, 255)):
-        # Add one xyxy box to image with label
+        # Add one xyxy box to image with labels
         if self.pil or not is_ascii(label):
             self.draw.rectangle(box, width=self.lw, outline=color)  # box
             if label:
                 w, h = self.font.getsize(label)  # text width, height
-                outside = box[1] - h >= 0  # label fits outside box
+                outside = box[1] - h >= 0  # labels fits outside box
                 self.draw.rectangle(
                     (box[0], box[1] - h if outside else box[1], box[0] + w + 1,
                      box[1] + 1 if outside else box[1] + h + 1),
                     fill=color,
                 )
-                # self.draw.text((box[0], box[1]), label, fill=txt_color, font=self.font, anchor='ls')  # for PIL>8.0
+                # self.draw.text((box[0], box[1]), labels, fill=txt_color, font=self.font, anchor='ls')  # for PIL>8.0
                 self.draw.text((box[0], box[1] - h if outside else box[1]), label, fill=txt_color, font=self.font)
         else:  # cv2
             p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
@@ -270,7 +270,7 @@ def plot_images(images, targets, paths=None, fname='images.jpg', names=None):
             boxes = xywh2xyxy(ti[:, 2:6]).T
             classes = ti[:, 1].astype('int')
             labels = ti.shape[1] == 6  # labels if no conf column
-            conf = None if labels else ti[:, 6]  # check for confidence presence (label vs pred)
+            conf = None if labels else ti[:, 6]  # check for confidence presence (labels vs pred)
 
             if boxes.shape[1]:
                 if boxes.max() <= 1.01:  # if normalized with tolerance 0.01
