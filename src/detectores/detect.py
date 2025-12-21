@@ -8,7 +8,7 @@ import pathlib
 # Agregar el directorio src al path para imports
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
 
-from config.config import MODEL_PATH
+from config.application_config import MODEL_PATH
 
 # Configuración de rutas según el sistema operativo
 # Solo aplicar el fix de Windows si estamos en Windows
