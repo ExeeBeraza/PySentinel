@@ -250,9 +250,66 @@ class Principal:
         )
 
         if image_path:
+            self.analizar_imagen_directa(image_path)
+
+    def analizar_imagen_directa(self, image_path):
+        """Analiza una imagen y muestra los resultados"""
+        # Mostrar pantalla de carga
+        from loading import LoadingScreen
+        loading = LoadingScreen(
+            self.root,
+            "Analizando imagen...",
+            "Detectando armas con IA"
+        )
+        loading.mostrar()
+
+        def procesar_imagen():
             print(f"Analizando imagen: {image_path}")
-            detectar_pistola(image_path)
-            print("✅ Detección completada")
+            loading.actualizar_mensaje("Procesando...", "Ejecutando modelo YOLO")
+
+            try:
+                resultado = detectar_pistola(image_path)
+                print("✅ Detección completada")
+
+                loading.ocultar()
+
+                # Extraer detecciones del resultado
+                detecciones = []
+                imagen_resultado = None
+
+                if resultado is not None:
+                    # Obtener pandas dataframe con resultados
+                    try:
+                        df = resultado.pandas().xyxy[0]
+                        for _, row in df.iterrows():
+                            detecciones.append({
+                                'name': row['name'],
+                                'confidence': row['confidence'],
+                            })
+
+                        # Obtener imagen renderizada
+                        rendered = resultado.render()
+                        if rendered and len(rendered) > 0:
+                            imagen_resultado = rendered[0]
+                    except Exception as e:
+                        print(f"Error extrayendo resultados: {e}")
+
+                # Mostrar pantalla de resultados
+                from modulo_GUI_resultados import Resultados
+                Resultados(self.root, image_path, detecciones, imagen_resultado)
+
+            except Exception as e:
+                print(f"❌ Error en detección: {e}")
+                loading.ocultar()
+
+                from tkinter import messagebox
+                messagebox.showerror(
+                    "Error",
+                    f"Error al analizar la imagen:\n{str(e)}"
+                )
+
+        # Ejecutar detección después de mostrar loading
+        self.root.after(100, procesar_imagen)
 
     def ir_perfil(self):
         """Navega a la pantalla de perfil"""

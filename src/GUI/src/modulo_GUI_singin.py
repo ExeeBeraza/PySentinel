@@ -219,15 +219,29 @@ class Registro:
             )
             return
 
-        print(f"✅ Usuario registrado: {username}")
+        # Mostrar pantalla de carga
+        from loading import LoadingScreen
+        loading = LoadingScreen(self.root, "Creando cuenta...", "Registrando usuario")
+        loading.mostrar()
 
-        messagebox.showinfo(
-            "Registro exitoso",
-            f"¡Bienvenido {nombre}!\nTu cuenta ha sido creada exitosamente."
-        )
+        def procesar_registro():
+            # Simular delay de registro en BD
+            import time
+            time.sleep(2)
 
-        # Ir a la pantalla principal
-        self.ir_principal()
+            loading.ocultar()
+            print(f"✅ Usuario registrado: {username}")
+
+            messagebox.showinfo(
+                "Registro exitoso",
+                f"¡Bienvenido {nombre}!\nTu cuenta ha sido creada exitosamente."
+            )
+
+            # Ir a la pantalla principal
+            self.ir_principal()
+
+        # Ejecutar registro después de mostrar loading
+        self.root.after(100, procesar_registro)
 
     def ir_principal(self):
         """Navega a la pantalla principal"""

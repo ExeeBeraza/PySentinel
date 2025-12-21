@@ -227,19 +227,34 @@ class Login:
             )
             return
 
-        # Validar credenciales
-        if usuario in USUARIOS_TEST and USUARIOS_TEST[usuario] == password:
-            print(f"✅ Iniciando sesión como: {usuario}")
-            messagebox.showinfo(
-                "Bienvenido",
-                f"¡Hola {usuario}! Has iniciado sesión correctamente."
-            )
-            self.ir_principal()
-        else:
-            messagebox.showerror(
-                "Error de autenticación",
-                "Usuario o contraseña incorrectos.\n\nUsuario de prueba: admin / admin"
-            )
+        # Mostrar pantalla de carga
+        from loading import LoadingScreen
+        loading = LoadingScreen(self.root, "Iniciando sesión...", "Verificando credenciales")
+        loading.mostrar()
+
+        def validar():
+            # Simular delay de conexión a BD
+            import time
+            time.sleep(1.5)
+
+            # Validar credenciales
+            if usuario in USUARIOS_TEST and USUARIOS_TEST[usuario] == password:
+                loading.ocultar()
+                print(f"✅ Iniciando sesión como: {usuario}")
+                messagebox.showinfo(
+                    "Bienvenido",
+                    f"¡Hola {usuario}! Has iniciado sesión correctamente."
+                )
+                self.ir_principal()
+            else:
+                loading.ocultar()
+                messagebox.showerror(
+                    "Error de autenticación",
+                    "Usuario o contraseña incorrectos.\n\nUsuario de prueba: admin / admin"
+                )
+
+        # Ejecutar validación después de mostrar loading
+        self.root.after(100, validar)
 
     def ir_principal(self):
         """Navega a la pantalla principal"""
