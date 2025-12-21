@@ -1,34 +1,42 @@
 """
-PySentinel - Configuración de Base de Datos
-Credenciales para conectar a MySQL (Docker)
+PySentinel - Configuración General
+Credenciales de BD y rutas del modelo
 """
+
+import os
 
 # =============================================================================
 # CONFIGURACIÓN DE LA BASE DE DATOS (Docker)
 # =============================================================================
 
 DB_CONFIG = {
-    "host": "localhost",
-    "port": 3306,
-    "user": "user",
-    "password": "123123",
-    "database": "pysentinel",
+    "host": os.environ.get("PYSENTINEL_DB_HOST", "localhost"),
+    "port": int(os.environ.get("PYSENTINEL_DB_PORT", 3306)),
+    "user": os.environ.get("PYSENTINEL_DB_USER", "user"),
+    "password": os.environ.get("PYSENTINEL_DB_PASSWORD", "123123"),
+    "database": os.environ.get("PYSENTINEL_DB_NAME", "pysentinel"),
 }
 
 # Configuración alternativa con usuario root
 DB_CONFIG_ROOT = {
-    "host": "localhost",
-    "port": 3306,
+    "host": os.environ.get("PYSENTINEL_DB_HOST", "localhost"),
+    "port": int(os.environ.get("PYSENTINEL_DB_PORT", 3306)),
     "user": "root",
-    "password": "12341234",
-    "database": "pysentinel",
+    "password": os.environ.get("PYSENTINEL_DB_ROOT_PASSWORD", "12341234"),
+    "database": os.environ.get("PYSENTINEL_DB_NAME", "pysentinel"),
 }
+
+# =============================================================================
+# CONFIGURACIÓN DEL MODELO YOLO
+# =============================================================================
+
+MODEL_PATH = os.environ.get("PYSENTINEL_MODEL_PATH", "src/detectores/yolov5s.pt")
 
 # =============================================================================
 # CONFIGURACIÓN GENERAL
 # =============================================================================
 
-DEBUG = True
-CONNECTION_TIMEOUT = 10
-MAX_RETRIES = 3
+DEBUG = os.environ.get("PYSENTINEL_DEBUG", "true").lower() == "true"
+CONNECTION_TIMEOUT = int(os.environ.get("PYSENTINEL_CONNECTION_TIMEOUT", 10))
+MAX_RETRIES = int(os.environ.get("PYSENTINEL_MAX_RETRIES", 3))
 

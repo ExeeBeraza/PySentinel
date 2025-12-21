@@ -1,8 +1,14 @@
+import sys
 import torch
 import cv2 as cv
 import numpy as np
 import platform
 import pathlib
+
+# Agregar el directorio src al path para imports
+sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
+
+from db.config import MODEL_PATH
 
 # Configuración de rutas según el sistema operativo
 # Solo aplicar el fix de Windows si estamos en Windows
@@ -30,8 +36,8 @@ def detectar_pistola(ruta_imagen, mostrar_ventana=False):
     # Nota: Para detección específica de pistolas, necesitarías un modelo entrenado
     model = torch.hub.load(
         'ultralytics/yolov5',
-        'yolov5s',  # Modelo preentrenado base
-        pretrained=True
+        'custom',
+        path=MODEL_PATH
     )
 
     # Leer la imagen
