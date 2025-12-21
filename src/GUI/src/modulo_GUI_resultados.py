@@ -10,6 +10,9 @@ from PIL import Image, ImageTk
 from pathlib import Path
 from datetime import datetime
 
+import cv2
+import numpy as np
+
 import theme
 
 
@@ -55,9 +58,6 @@ class Resultados:
 
             # Cargar imagen con resultados si existe
             if self.imagen_resultado is not None:
-                import cv2
-                from PIL import Image
-                import numpy as np
 
                 # Convertir de BGR a RGB
                 if len(self.imagen_resultado.shape) == 3:
