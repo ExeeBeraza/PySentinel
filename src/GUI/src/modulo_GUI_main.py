@@ -250,9 +250,29 @@ class Principal:
         )
 
         if image_path:
-            print(f"Analizando imagen: {image_path}")
-            detectar_pistola(image_path)
-            print("✅ Detección completada")
+            # Mostrar pantalla de carga
+            from loading import LoadingScreen
+            loading = LoadingScreen(
+                self.root,
+                "Analizando imagen...",
+                "Detectando armas con IA"
+            )
+            loading.mostrar()
+
+            def procesar_imagen():
+                print(f"Analizando imagen: {image_path}")
+                loading.actualizar_mensaje("Procesando...", "Ejecutando modelo YOLO")
+
+                try:
+                    detectar_pistola(image_path)
+                    print("✅ Detección completada")
+                except Exception as e:
+                    print(f"❌ Error en detección: {e}")
+                finally:
+                    loading.ocultar()
+
+            # Ejecutar detección después de mostrar loading
+            self.root.after(100, procesar_imagen)
 
     def ir_perfil(self):
         """Navega a la pantalla de perfil"""
