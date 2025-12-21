@@ -11,15 +11,16 @@ if platform.system() == 'Windows':
     pathlib.PosixPath = pathlib.WindowsPath
 
 
-def detectar_pistola(ruta_imagen):
+def detectar_pistola(ruta_imagen, mostrar_ventana=False):
     """
     Detecta objetos en una imagen usando YOLOv5.
 
     Args:
         ruta_imagen: Ruta a la imagen a analizar
+        mostrar_ventana: Si True, muestra la imagen con OpenCV (default: False)
 
     Returns:
-        Resultados de la detección
+        Resultados de la detección (objeto YOLO Results)
     """
     if not ruta_imagen:
         print("No se seleccionó ninguna imagen")
@@ -27,7 +28,6 @@ def detectar_pistola(ruta_imagen):
 
     # Cargar el modelo YOLOv5 preentrenado
     # Nota: Para detección específica de pistolas, necesitarías un modelo entrenado
-    # Por ahora usamos yolov5s que detecta objetos generales
     model = torch.hub.load(
         'ultralytics/yolov5',
         'yolov5s',  # Modelo preentrenado base
@@ -47,12 +47,11 @@ def detectar_pistola(ruta_imagen):
     # Imprimir resultados en consola
     print(detect)
 
-    # Mostrar la imagen con las detecciones en una ventana
-    cv.imshow('Detector - PySentinel', np.squeeze(detect.render()))
-
-    # Esperar a que el usuario presione una tecla
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+    # Mostrar la imagen con las detecciones en una ventana (opcional)
+    if mostrar_ventana:
+        cv.imshow('Detector - PySentinel', np.squeeze(detect.render()))
+        cv.waitKey(0)
+        cv.destroyAllWindows()
 
     return detect
 
@@ -65,4 +64,5 @@ if __name__ == "__main__":
     else:
         ruta = input("Ingresa la ruta de la imagen: ")
 
-    detectar_pistola(ruta)
+    # Al ejecutar directamente, mostrar ventana
+    detectar_pistola(ruta, mostrar_ventana=True)
