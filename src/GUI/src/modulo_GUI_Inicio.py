@@ -3,13 +3,18 @@ PySentinel - Pantalla de Inicio (Welcome)
 Primera pantalla que ve el usuario al abrir la aplicación
 """
 
+import sys
 import tkinter as tk
 import tkinter.font as tkFont
-from tkinter import Tk
+from tkinter import Tk, messagebox
 from PIL import Image, ImageTk
 from pathlib import Path
 
+# Agregar el directorio src al path para imports
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
 import theme
+from db.connector import get_db
 
 
 class Inicio:
@@ -206,7 +211,41 @@ class Inicio:
 # PUNTO DE ENTRADA
 # =============================================================================
 
-if __name__ == "__main__":
+def iniciar_aplicacion():
+    """Inicializa la aplicación y conecta a la base de datos"""
+    # Crear ventana principal
     root = Tk()
+    root.withdraw()  # Ocultar mientras se conecta
+
+    # Intentar conectar a la base de datos
+    print("🔌 Conectando a la base de datos...")
+    db = get_db()
+
+    if db.conectar():
+        print("✅ Conexión a BD establecida")
+    else:
+        print("⚠️ No se pudo conectar a la base de datos")
+        # Mostrar advertencia pero permitir continuar
+        messagebox.showwarning(
+            "Aviso de Conexión",
+            "No se pudo conectar a la base de datos.\n\n"
+            "La aplicación funcionará en modo offline.\n"
+            "Algunas funciones estarán limitadas."
+        )
+
+    # Mostrar ventana principal
+    root.deiconify()
     app = Inicio(root)
+
+    # Manejar cierre de aplicación
+    def on_closing():
+        print("👋 Cerrando aplicación...")
+        db.desconectar()
+        root.destroy()
+
+    root.protocol("WM_DELETE_WINDOW", on_closing)
     root.mainloop()
+
+
+if __name__ == "__main__":
+    iniciar_aplicacion()
