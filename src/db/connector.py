@@ -154,6 +154,66 @@ class DatabaseConnector:
             'rol': None
         }
 
+    def obtener_perfil(self, id_usuario: int) -> dict:
+        """
+        Obtiene la información del perfil de un usuario
+
+        Args:
+            id_usuario: ID del usuario
+
+        Returns:
+            dict: {id_usuario, username, nombre, correo_electronico, fecha_registro, rol, total_analisis}
+        """
+        resultado = self._ejecutar_procedure(
+            'sp_obtener_perfil_usuario',
+            (id_usuario,)
+        )
+
+        if resultado:
+            return {
+                'exito': True,
+                'id_usuario': resultado.get('id_usuario'),
+                'username': resultado.get('username'),
+                'nombre': resultado.get('nombre'),
+                'correo': resultado.get('correo_electronico'),
+                'fecha_registro': resultado.get('fecha_registro'),
+                'rol': resultado.get('rol'),
+                'total_analisis': resultado.get('total_analisis', 0)
+            }
+
+        return {
+            'exito': False,
+            'mensaje': 'Usuario no encontrado'
+        }
+
+    def actualizar_perfil(self, id_usuario: int, nombre: str, correo: str) -> dict:
+        """
+        Actualiza la información del perfil de un usuario
+
+        Args:
+            id_usuario: ID del usuario
+            nombre: Nuevo nombre completo
+            correo: Nuevo correo electrónico
+
+        Returns:
+            dict: {exito: bool, mensaje: str}
+        """
+        resultado = self._ejecutar_procedure(
+            'sp_actualizar_perfil_usuario',
+            (id_usuario, nombre, correo)
+        )
+
+        if resultado:
+            return {
+                'exito': bool(resultado.get('exito')),
+                'mensaje': resultado.get('mensaje')
+            }
+
+        return {
+            'exito': False,
+            'mensaje': 'Error de conexión con la base de datos'
+        }
+
     # =========================================================================
     # OPERACIONES DE ANÁLISIS
     # =========================================================================
@@ -309,6 +369,14 @@ def registrar_usuario(username: str, nombre: str, correo: str, contraseña: str,
 def login_usuario(username: str, contraseña: str) -> dict:
     """Wrapper para login de usuario"""
     return get_db().login_usuario(username, contraseña)
+
+def obtener_perfil(id_usuario: int) -> dict:
+    """Wrapper para obtener perfil de usuario"""
+    return get_db().obtener_perfil(id_usuario)
+
+def actualizar_perfil(id_usuario: int, nombre: str, correo: str) -> dict:
+    """Wrapper para actualizar perfil de usuario"""
+    return get_db().actualizar_perfil(id_usuario, nombre, correo)
 
 def guardar_resultado_completo(id_usuario: int, imagen_blob: bytes,
                                 objetos_detectados: list, fecha_hora=None) -> dict:
