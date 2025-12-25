@@ -62,7 +62,7 @@ def plot_images_and_masks(images, targets, masks, paths=None, fname='images.jpg'
             boxes = xywh2xyxy(ti[:, 2:6]).T
             classes = ti[:, 1].astype('int')
             labels = ti.shape[1] == 6  # labels if no conf column
-            conf = None if labels else ti[:, 6]  # check for confidence presence (label vs pred)
+            conf = None if labels else ti[:, 6]  # check for confidence presence (labels vs pred)
 
             if boxes.shape[1]:
                 if boxes.max() <= 1.01:  # if normalized with tolerance 0.01

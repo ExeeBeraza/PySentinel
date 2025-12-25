@@ -3,13 +3,19 @@ PySentinel - Pantalla de Perfil
 Gestión del perfil de usuario
 """
 
+import sys
 import tkinter as tk
 import tkinter.font as tkFont
-from tkinter import Tk
+from tkinter import Tk, messagebox
 from PIL import Image, ImageTk
 from pathlib import Path
 
+# Agregar el directorio src al path para imports
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
 import theme
+from db.connector import obtener_perfil, actualizar_perfil
+from modulo_GUI_login import get_usuario_actual, cerrar_sesion
 
 
 class Perfil:
@@ -17,8 +23,10 @@ class Perfil:
 
     def __init__(self, root):
         self.root = root
+        self.usuario = None
         self.setup_window()
         self.load_resources()
+        self.cargar_datos_usuario()
         self.create_widgets()
 
     def setup_window(self):
@@ -41,6 +49,26 @@ class Perfil:
             img = Image.open(ruta_perfil)
             img = img.resize((120, 120), Image.Resampling.LANCZOS)
             self.photo_perfil = ImageTk.PhotoImage(img)
+
+    def cargar_datos_usuario(self):
+        """Carga los datos del usuario desde la BD"""
+        usuario_actual = get_usuario_actual()
+
+        if usuario_actual and usuario_actual.get('id'):
+            resultado = obtener_perfil(usuario_actual['id'])
+            if resultado.get('exito'):
+                self.usuario = resultado
+            else:
+                self.usuario = usuario_actual
+        else:
+            self.usuario = {
+                'username': 'Sin sesión',
+                'nombre': '',
+                'correo': '',
+                'rol': '',
+                'fecha_registro': None,
+                'total_analisis': 0
+            }
 
     def create_widgets(self):
         """Crea todos los widgets"""
@@ -84,7 +112,7 @@ class Perfil:
         content = tk.Frame(main_frame, bg=theme.PRIMARY)
         content.pack(fill="both", expand=True)
 
-        # Columna izquierda - Foto de perfil
+        # Columna izquierda - Foto de perfil y estadísticas
         left_col = tk.Frame(content, bg=theme.PRIMARY, width=200)
         left_col.pack(side="left", fill="y", padx=(0, 40))
 
@@ -105,17 +133,71 @@ class Perfil:
             )
         photo_label.pack(pady=10)
 
-        # Botón cambiar foto
-        btn_font = tkFont.Font(family=theme.FONT_FAMILY, size=theme.FONT_SIZE_SMALL)
-        btn_foto = tk.Button(
+        # Nombre de usuario debajo de la foto
+        username_font = tkFont.Font(family=theme.FONT_FAMILY_TITLE, size=14, weight="bold")
+        username_label = tk.Label(
             photo_card,
-            text="📷 Cambiar foto",
-            font=btn_font,
-            **theme.get_button_style()
+            text=f"@{self.usuario.get('username', '')}",
+            font=username_font,
+            bg=theme.BG_CARD,
+            fg=theme.ACCENT
         )
-        btn_foto.pack(pady=(15, 0), ipadx=10, ipady=5)
+        username_label.pack(pady=(10, 5))
 
-        # Columna derecha - Formulario
+        # Rol del usuario
+        rol_font = tkFont.Font(family=theme.FONT_FAMILY, size=10)
+        rol_label = tk.Label(
+            photo_card,
+            text=f"🏷️ {self.usuario.get('rol', 'usuario').capitalize()}",
+            font=rol_font,
+            bg=theme.BG_CARD,
+            fg=theme.TEXT_MUTED
+        )
+        rol_label.pack()
+
+        # Card de estadísticas
+        stats_card = tk.Frame(left_col, bg=theme.BG_CARD, padx=25, pady=20)
+        stats_card.pack(pady=10, fill="x")
+
+        stats_title_font = tkFont.Font(family=theme.FONT_FAMILY, size=11, weight="bold")
+        stats_title = tk.Label(
+            stats_card,
+            text="📊 Estadísticas",
+            font=stats_title_font,
+            bg=theme.BG_CARD,
+            fg=theme.TEXT_PRIMARY
+        )
+        stats_title.pack(anchor="w", pady=(0, 10))
+
+        # Total de análisis
+        stats_font = tkFont.Font(family=theme.FONT_FAMILY, size=10)
+        total_analisis = self.usuario.get('total_analisis', 0)
+        stats_analisis = tk.Label(
+            stats_card,
+            text=f"🔍 Análisis realizados: {total_analisis}",
+            font=stats_font,
+            bg=theme.BG_CARD,
+            fg=theme.TEXT_SECONDARY
+        )
+        stats_analisis.pack(anchor="w", pady=2)
+
+        # Fecha de registro
+        fecha_registro = self.usuario.get('fecha_registro')
+        if fecha_registro:
+            fecha_str = fecha_registro.strftime("%d/%m/%Y") if hasattr(fecha_registro, 'strftime') else str(fecha_registro)[:10]
+        else:
+            fecha_str = "N/A"
+
+        stats_fecha = tk.Label(
+            stats_card,
+            text=f"📅 Miembro desde: {fecha_str}",
+            font=stats_font,
+            bg=theme.BG_CARD,
+            fg=theme.TEXT_SECONDARY
+        )
+        stats_fecha.pack(anchor="w", pady=2)
+
+        # Columna derecha - Información del usuario
         right_col = tk.Frame(content, bg=theme.PRIMARY)
         right_col.pack(side="left", fill="both", expand=True)
 
@@ -130,19 +212,18 @@ class Perfil:
         )
         section_title.pack(anchor="w", pady=(0, 20))
 
-        # Campos del formulario
+        # Campos del formulario con datos del usuario
         fields = [
-            ("Nombre de usuario", "usuario_ejemplo"),
-            ("Nombre completo", ""),
-            ("Correo electrónico", ""),
-            ("Contraseña", "••••••••"),
+            ("👤 Nombre de usuario", self.usuario.get('username', '')),
+            ("📛 Nombre completo", self.usuario.get('nombre', '')),
+            ("📧 Correo electrónico", self.usuario.get('correo', '')),
         ]
 
         self.entries = {}
         label_font = tkFont.Font(family=theme.FONT_FAMILY, size=theme.FONT_SIZE_SMALL)
         entry_font = tkFont.Font(family=theme.FONT_FAMILY, size=theme.FONT_SIZE_NORMAL)
 
-        for label_text, placeholder in fields:
+        for label_text, value in fields:
             # Frame del campo
             field_frame = tk.Frame(right_col, bg=theme.PRIMARY)
             field_frame.pack(fill="x", pady=8)
@@ -157,18 +238,20 @@ class Perfil:
             )
             label.pack(anchor="w")
 
-            # Entry
-            is_password = "Contraseña" in label_text
+            # Entry (solo lectura para mostrar datos)
             entry = tk.Entry(
                 field_frame,
                 font=entry_font,
-                show="•" if is_password else "",
                 **theme.get_entry_style()
             )
             entry.pack(fill="x", pady=(5, 0), ipady=10)
 
-            if placeholder:
-                entry.insert(0, placeholder)
+            if value:
+                entry.insert(0, value)
+
+            # Hacer el campo de solo lectura para username y correo
+            if "usuario" in label_text.lower():
+                entry.config(state="readonly")
 
             self.entries[label_text] = entry
 
@@ -178,7 +261,7 @@ class Perfil:
 
         btn_action_font = tkFont.Font(family=theme.FONT_FAMILY, size=theme.FONT_SIZE_BUTTON, weight="bold")
 
-        # Botón guardar
+        # Botón guardar (deshabilitado por ahora)
         btn_guardar = tk.Button(
             btn_frame,
             text="💾  Guardar Cambios",
@@ -193,7 +276,7 @@ class Perfil:
             btn_frame,
             text="🚪  Cerrar Sesión",
             font=btn_action_font,
-            command=self.cerrar_sesion,
+            command=self.cerrar_sesion_action,
             **theme.get_button_style()
         )
         btn_logout.pack(side="left", padx=(15, 0), ipadx=20, ipady=10)
@@ -209,12 +292,69 @@ class Perfil:
 
     def guardar(self):
         """Guarda los cambios del perfil"""
-        print("💾 Guardando cambios...")
+        # Obtener valores de los campos editables
+        nombre = self.entries.get("📛 Nombre completo")
+        correo = self.entries.get("📧 Correo electrónico")
 
-    def cerrar_sesion(self):
+        if not nombre or not correo:
+            messagebox.showwarning(
+                "Campos incompletos",
+                "Por favor completa todos los campos"
+            )
+            return
+
+        nuevo_nombre = nombre.get().strip()
+        nuevo_correo = correo.get().strip()
+
+        if not nuevo_nombre or not nuevo_correo:
+            messagebox.showwarning(
+                "Campos vacíos",
+                "El nombre y correo no pueden estar vacíos"
+            )
+            return
+
+        # Obtener ID del usuario actual
+        usuario_actual = get_usuario_actual()
+        if not usuario_actual or not usuario_actual.get('id'):
+            messagebox.showerror(
+                "Error",
+                "No hay sesión activa"
+            )
+            return
+
+        # Mostrar pantalla de carga
+        from loading import LoadingScreen
+        loading = LoadingScreen(self.root, "Guardando...", "Actualizando información del perfil")
+        loading.mostrar()
+
+        def procesar_guardado():
+            resultado = actualizar_perfil(
+                id_usuario=usuario_actual['id'],
+                nombre=nuevo_nombre,
+                correo=nuevo_correo
+            )
+
+            loading.ocultar()
+
+            if resultado['exito']:
+                print(f"✅ Perfil actualizado: {nuevo_nombre}")
+                messagebox.showinfo(
+                    "Éxito",
+                    "Tu perfil ha sido actualizado correctamente"
+                )
+                # Recargar la pantalla para mostrar los cambios
+                self.cargar_datos_usuario()
+            else:
+                print(f"❌ Error actualizando perfil: {resultado['mensaje']}")
+                messagebox.showerror(
+                    "Error",
+                    resultado['mensaje']
+                )
+
+        self.root.after(100, procesar_guardado)
+
+    def cerrar_sesion_action(self):
         """Cierra la sesión del usuario"""
-        from tkinter import messagebox
-
         # Confirmar cierre de sesión
         confirmar = messagebox.askyesno(
             "Cerrar Sesión",
@@ -222,7 +362,8 @@ class Perfil:
         )
 
         if confirmar:
-            print("🚪 Cerrando sesión...")
+            cerrar_sesion()  # Limpiar sesión
+            print("🚪 Sesión cerrada")
             from modulo_GUI_Inicio import Inicio
             Inicio(self.root)
 

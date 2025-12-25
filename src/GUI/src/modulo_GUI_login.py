@@ -3,12 +3,21 @@ PySentinel - Pantalla de Login
 Inicio de sesión de usuarios
 """
 
+import sys
 import tkinter as tk
 import tkinter.font as tkFont
 from tkinter import Tk, messagebox
 from pathlib import Path
 
+# Agregar el directorio src al path para imports
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
 import theme
+from db.connector import login_usuario
+
+
+# Variable global para almacenar el usuario logueado
+usuario_actual = None
 
 
 class Login:
@@ -85,21 +94,20 @@ class Login:
 
         user_label = tk.Label(
             user_frame,
-            text="👤  Usuario",
+            text="👤  Nombre de usuario",
             font=label_font,
             bg=theme.BG_CARD,
             fg=theme.TEXT_SECONDARY
         )
         user_label.pack(anchor="w")
 
-        self.entry_usuario = tk.Entry(
+        self.entry_username = tk.Entry(
             user_frame,
             font=entry_font,
             width=35,
             **theme.get_entry_style()
         )
-        self.entry_usuario.pack(fill="x", pady=(5, 0), ipady=12)
-        self.entry_usuario.insert(0, "")
+        self.entry_username.pack(fill="x", pady=(5, 0), ipady=12)
 
         # Campo Contraseña
         pass_frame = tk.Frame(form_frame, bg=theme.BG_CARD)
@@ -123,17 +131,8 @@ class Login:
         )
         self.entry_password.pack(fill="x", pady=(5, 0), ipady=12)
 
-        # Link olvidé contraseña
-        forgot_font = tkFont.Font(family=theme.FONT_FAMILY, size=10)
-        forgot_link = tk.Label(
-            form_frame,
-            text="¿Olvidaste tu contraseña?",
-            font=forgot_font,
-            bg=theme.BG_CARD,
-            fg=theme.ACCENT,
-            cursor="hand2"
-        )
-        forgot_link.pack(anchor="e", pady=(5, 0))
+        # Bind Enter key para login
+        self.entry_password.bind("<Return>", lambda e: self.iniciar_sesion())
 
         # Botón de login
         btn_frame = tk.Frame(card_frame, bg=theme.BG_CARD)
@@ -152,6 +151,8 @@ class Login:
         # Separador
         separator_frame = tk.Frame(card_frame, bg=theme.BG_CARD)
         separator_frame.pack(fill="x", pady=15)
+
+        forgot_font = tkFont.Font(family=theme.FONT_FAMILY, size=10)
 
         sep_line1 = tk.Frame(separator_frame, bg=theme.BORDER_COLOR, height=1)
         sep_line1.pack(side="left", fill="x", expand=True)
@@ -212,15 +213,12 @@ class Login:
 
     def iniciar_sesion(self):
         """Procesa el inicio de sesión"""
-        usuario = self.entry_usuario.get()
+        global usuario_actual
+
+        username = self.entry_username.get().strip()
         password = self.entry_password.get()
 
-        # Usuario de prueba hardcodeado
-        USUARIOS_TEST = {
-            "admin": "admin",
-        }
-
-        if not usuario or not password:
+        if not username or not password:
             messagebox.showwarning(
                 "Campos vacíos",
                 "Por favor ingresa tu usuario y contraseña"
@@ -233,24 +231,33 @@ class Login:
         loading.mostrar()
 
         def validar():
-            # Simular delay de conexión a BD
-            import time
-            time.sleep(1.5)
+            global usuario_actual
 
-            # Validar credenciales
-            if usuario in USUARIOS_TEST and USUARIOS_TEST[usuario] == password:
-                loading.ocultar()
-                print(f"✅ Iniciando sesión como: {usuario}")
+            # Validar credenciales con la BD
+            resultado = login_usuario(username, password)
+
+            loading.ocultar()
+
+            if resultado['exito']:
+                # Guardar datos del usuario logueado
+                usuario_actual = {
+                    'id': resultado['id_usuario'],
+                    'username': username,
+                    'nombre': resultado['nombre'],
+                    'rol': resultado['rol']
+                }
+
+                print(f"✅ Sesión iniciada: {resultado['nombre']} (ID: {resultado['id_usuario']})")
                 messagebox.showinfo(
                     "Bienvenido",
-                    f"¡Hola {usuario}! Has iniciado sesión correctamente."
+                    f"¡Hola {resultado['nombre']}!\nHas iniciado sesión correctamente."
                 )
                 self.ir_principal()
             else:
-                loading.ocultar()
+                print(f"❌ Error de login: {resultado['mensaje']}")
                 messagebox.showerror(
                     "Error de autenticación",
-                    "Usuario o contraseña incorrectos.\n\nUsuario de prueba: admin / admin"
+                    resultado['mensaje']
                 )
 
         # Ejecutar validación después de mostrar loading
@@ -270,6 +277,18 @@ class Login:
         """Vuelve a la pantalla de inicio"""
         from modulo_GUI_Inicio import Inicio
         Inicio(self.root)
+
+
+def get_usuario_actual():
+    """Retorna el usuario actualmente logueado"""
+    return usuario_actual
+
+
+def cerrar_sesion():
+    """Cierra la sesión del usuario actual"""
+    global usuario_actual
+    usuario_actual = None
+    print("🚪 Sesión cerrada")
 
 
 # =============================================================================

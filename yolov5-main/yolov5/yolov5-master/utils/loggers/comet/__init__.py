@@ -263,7 +263,7 @@ class CometLogger:
         metadata = []
         for cls, *xyxy in filtered_labels.tolist():
             metadata.append({
-                "label": f"{self.class_names[int(cls)]}-gt",
+                "labels": f"{self.class_names[int(cls)]}-gt",
                 "score": 100,
                 "box": {
                     "x": xyxy[0],
@@ -272,7 +272,7 @@ class CometLogger:
                     "y2": xyxy[3]},})
         for *xyxy, conf, cls in filtered_detections.tolist():
             metadata.append({
-                "label": f"{self.class_names[int(cls)]}",
+                "labels": f"{self.class_names[int(cls)]}",
                 "score": conf * 100,
                 "box": {
                     "x": xyxy[0],

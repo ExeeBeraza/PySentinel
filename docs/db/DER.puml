@@ -1,0 +1,33 @@
+@startuml
+
+entity Usuario as "usuario"{
+    id_usuario : INT <<PK>>
+    nombre : VARCHAR(50) <<NOT NULL>>
+    correo_electronico : VARCHAR(50) <<UNIQUE,NOT NULL>>
+    contraseña : VARCHAR(100) <<NOT NULL>>
+    rol : VARCHAR(20)
+    fecha_registro : datetime
+}
+
+entity Analisis as "analisis"{
+    id_analisis : INT <<PK>>
+    id_usuario : INT <<FK>>
+    fecha_hora : datetime
+    imagen_procesada : LONGBLOB <<NOT NULL>>
+}
+
+entity Objeto_x_analisis{
+    id_objeto : INT <<PK,FK>>
+    id_analisis : INT <<PK,FK>>
+}
+
+entity Objeto as "objeto"{
+    id_objeto : INT <<PK>>
+    nombre : VARCHAR(50)
+}
+
+Usuario |o--o{ Analisis
+Objeto ||--o{ Objeto_x_analisis
+Analisis ||--o{ Objeto_x_analisis
+
+@enduml

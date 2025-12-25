@@ -19,7 +19,9 @@ sys.path.insert(0, str(src_dir))
 import theme
 from modulo_GUI_Perfil import Perfil
 from modulo_GUI_historial import Historial
+from modulo_GUI_login import get_usuario_actual
 from detectores.detect import detectar_pistola
+from db.connector import guardar_resultado_completo
 
 
 class Principal:
@@ -271,8 +273,6 @@ class Principal:
                 resultado = detectar_pistola(image_path)
                 print("✅ Detección completada")
 
-                loading.ocultar()
-
                 # Extraer detecciones del resultado
                 detecciones = []
                 imagen_resultado = None
@@ -294,6 +294,12 @@ class Principal:
                     except Exception as e:
                         print(f"Error extrayendo resultados: {e}")
 
+                # Guardar resultado en la BD
+                loading.actualizar_mensaje("Guardando...", "Registrando análisis en la base de datos")
+                self.guardar_resultado_bd(image_path, imagen_resultado, detecciones)
+
+                loading.ocultar()
+
                 # Mostrar pantalla de resultados
                 from modulo_GUI_resultados import Resultados
                 Resultados(self.root, image_path, detecciones, imagen_resultado)
@@ -310,6 +316,50 @@ class Principal:
 
         # Ejecutar detección después de mostrar loading
         self.root.after(100, procesar_imagen)
+
+    def guardar_resultado_bd(self, image_path, imagen_resultado, detecciones):
+        """Guarda el resultado del análisis en la base de datos"""
+        try:
+            # Obtener usuario actual
+            usuario = get_usuario_actual()
+            if not usuario or not usuario.get('id'):
+                print("⚠️ No hay usuario logueado, no se guardará el resultado")
+                return
+
+            # Convertir imagen a bytes
+            import cv2
+            imagen_bytes = None
+            if imagen_resultado is not None:
+                # Codificar imagen como JPEG
+                _, buffer = cv2.imencode('.jpg', imagen_resultado)
+                imagen_bytes = buffer.tobytes()
+            else:
+                # Si no hay imagen renderizada, leer la original
+                with open(image_path, 'rb') as f:
+                    imagen_bytes = f.read()
+
+            # Preparar objetos detectados para guardar
+            objetos_detectados = []
+            for det in detecciones:
+                objetos_detectados.append({
+                    'nombre': det['name'],
+                    'porcentaje_fiabilidad': round(det['confidence'] * 100, 2)
+                })
+
+            # Guardar en la BD
+            resultado = guardar_resultado_completo(
+                id_usuario=usuario['id'],
+                imagen_blob=imagen_bytes,
+                objetos_detectados=objetos_detectados
+            )
+
+            if resultado['exito']:
+                print(f"✅ Análisis guardado en BD (ID: {resultado['id_analisis']})")
+            else:
+                print(f"⚠️ No se pudo guardar el análisis: {resultado['mensaje']}")
+
+        except Exception as e:
+            print(f"⚠️ Error guardando análisis en BD: {e}")
 
     def ir_perfil(self):
         """Navega a la pantalla de perfil"""

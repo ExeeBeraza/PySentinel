@@ -3,12 +3,17 @@ PySentinel - Pantalla de Registro
 Registro de nuevos usuarios
 """
 
+import sys
 import tkinter as tk
 import tkinter.font as tkFont
 from tkinter import Tk, messagebox
 from pathlib import Path
 
+# Agregar el directorio src al path para imports
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+
 import theme
+from db.connector import registrar_usuario
 
 
 class Registro:
@@ -114,27 +119,9 @@ class Registro:
 
             self.entries[field_id] = entry
 
-        # Checkbox términos y condiciones
-        terms_frame = tk.Frame(card_frame, bg=theme.BG_CARD)
-        terms_frame.pack(fill="x", pady=(15, 5))
-
-        self.terms_var = tk.BooleanVar()
-        terms_check = tk.Checkbutton(
-            terms_frame,
-            text=" Acepto los términos y condiciones",
-            variable=self.terms_var,
-            font=label_font,
-            bg=theme.BG_CARD,
-            fg=theme.TEXT_SECONDARY,
-            activebackground=theme.BG_CARD,
-            activeforeground=theme.TEXT_PRIMARY,
-            selectcolor=theme.BG_INPUT
-        )
-        terms_check.pack(anchor="w")
-
         # Botón de registro
         btn_frame = tk.Frame(card_frame, bg=theme.BG_CARD)
-        btn_frame.pack(fill="x", pady=(15, 10))
+        btn_frame.pack(fill="x", pady=(20, 10))
 
         btn_font = tkFont.Font(family=theme.FONT_FAMILY, size=13, weight="bold")
         btn_registro = tk.Button(
@@ -191,9 +178,9 @@ class Registro:
     def registrar(self):
         """Procesa el registro del usuario"""
         # Obtener valores
-        username = self.entries["username"].get()
-        nombre = self.entries["nombre"].get()
-        email = self.entries["email"].get()
+        username = self.entries["username"].get().strip()
+        nombre = self.entries["nombre"].get().strip()
+        email = self.entries["email"].get().strip()
         password = self.entries["password"].get()
         password_confirm = self.entries["password_confirm"].get()
 
@@ -212,33 +199,43 @@ class Registro:
             )
             return
 
-        if not self.terms_var.get():
+        if len(password) < 6:
             messagebox.showwarning(
-                "Términos y condiciones",
-                "Debes aceptar los términos y condiciones"
+                "Contraseña débil",
+                "La contraseña debe tener al menos 6 caracteres"
             )
             return
 
         # Mostrar pantalla de carga
         from loading import LoadingScreen
-        loading = LoadingScreen(self.root, "Creando cuenta...", "Registrando usuario")
+        loading = LoadingScreen(self.root, "Creando cuenta...", "Registrando usuario en la base de datos")
         loading.mostrar()
 
         def procesar_registro():
-            # Simular delay de registro en BD
-            import time
-            time.sleep(2)
-
-            loading.ocultar()
-            print(f"✅ Usuario registrado: {username}")
-
-            messagebox.showinfo(
-                "Registro exitoso",
-                f"¡Bienvenido {nombre}!\nTu cuenta ha sido creada exitosamente."
+            # Registrar usuario en la BD
+            resultado = registrar_usuario(
+                username=username,
+                nombre=nombre,
+                correo=email,
+                contraseña=password
             )
 
-            # Ir a la pantalla principal
-            self.ir_principal()
+            loading.ocultar()
+
+            if resultado['exito']:
+                print(f"✅ Usuario registrado: {username} (ID: {resultado['id_usuario']})")
+                messagebox.showinfo(
+                    "Registro exitoso",
+                    f"¡Bienvenido {nombre}!\nTu cuenta ha sido creada exitosamente."
+                )
+                # Ir a la pantalla de login para que inicie sesión
+                self.ir_login()
+            else:
+                print(f"❌ Error en registro: {resultado['mensaje']}")
+                messagebox.showerror(
+                    "Error de registro",
+                    resultado['mensaje']
+                )
 
         # Ejecutar registro después de mostrar loading
         self.root.after(100, procesar_registro)
