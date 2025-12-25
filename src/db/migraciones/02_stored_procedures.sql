@@ -79,8 +79,8 @@ BEGIN
     IF v_usuario_existe = 0 THEN
         SELECT FALSE AS exito, 'El usuario no existe' AS mensaje, NULL AS id_analisis;
     ELSE
-        SET v_fecha = IFNULL(p_fecha_hora, NOW());
-        INSERT INTO analisis (id_usuario, fecha_hora, imagen_procesada) VALUES (p_id_usuario, v_fecha, p_imagen_procesada);
+    SET v_fecha = IFNULL(p_fecha_hora, CONVERT_TZ(NOW(), @@session.time_zone, '-03:00'));
+    INSERT INTO analisis (id_usuario, fecha_hora, imagen_procesada) VALUES (p_id_usuario, v_fecha, p_imagen_procesada);
         SELECT TRUE AS exito, 'Análisis guardado exitosamente' AS mensaje, LAST_INSERT_ID() AS id_analisis;
     END IF;
 END$$

@@ -2,12 +2,14 @@
 PySentinel - Conector de Base de Datos
 Funciones para interactuar con MySQL usando stored procedures
 """
-
+from datetime import datetime
 import sys
 import pathlib
 import json
 import mysql.connector
 from mysql.connector import Error
+import pytz
+from sympy.codegen.ast import none
 
 # Agregar el directorio src al path para imports
 sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
@@ -263,6 +265,11 @@ class DatabaseConnector:
         Returns:
             dict: {exito: bool, mensaje: str, id_analisis: int|None}
         """
+        if fecha_hora is None:
+            print("LLego aca?")
+            tz_utc_minus_3 = pytz.timezone('America/Argentina/Buenos_Aires')
+            fecha_hora = datetime.now(tz_utc_minus_3)
+
         # Convertir lista a JSON string
         objetos_json = json.dumps(objetos_detectados)
 
@@ -379,7 +386,7 @@ def actualizar_perfil(id_usuario: int, nombre: str, correo: str) -> dict:
     return get_db().actualizar_perfil(id_usuario, nombre, correo)
 
 def guardar_resultado_completo(id_usuario: int, imagen_blob: bytes,
-                                objetos_detectados: list, fecha_hora=None) -> dict:
+                                objetos_detectados: list, fecha_hora) -> dict:
     """Wrapper para guardar resultado completo"""
     return get_db().guardar_resultado_completo(id_usuario, imagen_blob, objetos_detectados, fecha_hora)
 

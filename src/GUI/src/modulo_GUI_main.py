@@ -350,7 +350,8 @@ class Principal:
             resultado = guardar_resultado_completo(
                 id_usuario=usuario['id'],
                 imagen_blob=imagen_bytes,
-                objetos_detectados=objetos_detectados
+                objetos_detectados=objetos_detectados,
+                fecha_hora=None
             )
 
             if resultado['exito']:

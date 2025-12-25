@@ -25,3 +25,5 @@ requests>=2.25.0
 # Base de datos MySQL
 mysql-connector-python>=8.0.0
 
+
+pytz
