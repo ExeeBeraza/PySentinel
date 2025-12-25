@@ -30,7 +30,7 @@ DB_CONFIG_ROOT = {
 # CONFIGURACIÓN DEL MODELO YOLO
 # =============================================================================
 
-MODEL_PATH = os.environ.get("PYSENTINEL_MODEL_PATH", "C:\\Users\\Exequiel\\Documents\\Proyecto Exe\\WeaponEyEdetecting\\neural_network\\model\\pistolas.pt")
+MODEL_PATH = os.environ.get("PYSENTINEL_MODEL_PATH", "/Users/imartinezber/Documents/Dev/Personal/PySentinel/neural_network/model/pistolas.pt")
 
 # =============================================================================
 # CONFIGURACIÓN GENERAL

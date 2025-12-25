@@ -9,6 +9,7 @@ from tkinter import Tk
 from PIL import Image, ImageTk
 from pathlib import Path
 from datetime import datetime
+import pytz
 
 import cv2
 import numpy as np
@@ -210,10 +211,12 @@ class Resultados:
         total_objetos = len(self.detecciones)
         armas_detectadas = sum(1 for d in self.detecciones if self._es_arma(d))
 
+        tz_utc_minus_3 = pytz.timezone('America/Argentina/Buenos_Aires')
+
         stats = [
             ("🔍 Objetos detectados:", str(total_objetos)),
             ("🔫 Armas encontradas:", str(armas_detectadas)),
-            ("📅 Fecha análisis:", datetime.now().strftime("%d/%m/%Y %H:%M")),
+            ("📅 Fecha análisis:", datetime.now(tz_utc_minus_3).strftime("%d/%m/%Y %H:%M")),
         ]
 
         stat_font = tkFont.Font(family=theme.FONT_FAMILY, size=11)
